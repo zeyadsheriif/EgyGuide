@@ -1,0 +1,13 @@
+streamlit
+tensorflow
+tensorflow-macos
+pillow
+"numpy<2.0"
+gradio
+torch 
+torchvision
+torchaudio
+transformers
+peft
+flask 
+requests
