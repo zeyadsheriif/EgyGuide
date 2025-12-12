@@ -49,7 +49,7 @@ Since the submission of the project proposal in October 2025, the team has compl
 How to run it:
 
 * **1. clone the repo using:**
-    * git clone https://github.com/zeyadsheriif/EgyGuide/tree/main
+    * git clone https://github.com/zeyadsheriif/EgyGuide.git
 
 * **2. create a virtual env using:**
     * conda create -n ai_tourist python=3.10 -y
