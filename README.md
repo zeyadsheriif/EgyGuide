@@ -7,18 +7,7 @@ EgyGuide is a cross-platform intelligent agent designed to revolutionize the way
 **Supervisor:** Dr. Mohamed Maher Ata  
 **Institution:** Zewail City of Science, Technology and Innovation  
 
----
 
-## 📋 Table of Contents
-1. [Project Summary](#-project-summary)
-2. [Team Members](#-team-members)
-3. [Progress Report](#-progress-since-proposal)
-4. [System Architecture](#-system-architecture)
-5. [Component Breakdown](#-component-breakdown)
-6. [Work Breakdown Structure](#-work-breakdown-structure)
-7. [Risk Analysis](#-risk-analysis)
-
----
 
 ## 📝 Project Summary
 **EgyGuide** is a cross-platform intelligent agent designed to revolutionize the cultural tourism experience in Egypt. The system addresses the "shallow" tourism experience caused by a lack of accessible and engaging historical information.
@@ -55,18 +44,7 @@ Since the submission of the project proposal in October 2025, the team has compl
 
 ---
 
-## 🏗 System Architecture
+## 🏗 Version 1 of the integrated usable website
+How to run it:
 
-The system follows a microservices-oriented architecture to ensure scalability.
 
-### High-Level Diagram
-```mermaid
-graph TD
-    User[User Smartphone/Web] -->|Upload Image| Frontend
-    Frontend[Frontend App (Flutter/Angular)] -->|API Request| API[API Gateway (Flask/FastAPI)]
-    API -->|Process Image| DL[Vision Model (CNN)]
-    DL -->|Return Landmark ID| API
-    API -->|Get Metadata| DB[(Database)]
-    API -->|Context + Query| NLP[LLM Chatbot]
-    NLP -->|Response| API
-    API -->|Final Response| Frontend
