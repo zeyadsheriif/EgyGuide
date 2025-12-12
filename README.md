@@ -45,6 +45,23 @@ Since the submission of the project proposal in October 2025, the team has compl
 ---
 
 ## 🏗 Version 1 of the integrated usable website
+
 How to run it:
 
+* **1. clone the repo using:**
+    * git clone https://github.com/your-username/EgyGuide.git
 
+* **2. create a virtual env using:**
+    * conda create -n ai_tourist python=3.10 -y
+ 
+* **3. Activate the virtual enviroment using:**
+    * conda activate ai_tourist
+ 
+* **4. Install python dependencies using:**
+    * pip install -r requirements.txt
+
+* **5. Create a termainal and run:**
+    * python vision_api.py
+
+* **6. Crate another terminal and run:**
+    * python app.py
