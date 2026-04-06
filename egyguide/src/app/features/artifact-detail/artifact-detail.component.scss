@@ -1,0 +1,294 @@
+.detail-container {
+  min-height: calc(100vh - 80px);
+  background-color: #0f0f0f;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.5rem;
+  padding: 2rem;
+  align-items: start;  // Add this
+
+  .left-panel {
+    height: calc(100vh - 120px);  // Match right panel height
+    display: flex;
+    flex-direction: column;
+    
+  .artifact-image {
+    width: 100%;
+    height: 450px;
+    background-color: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .uploaded-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      svg {
+        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+      }
+    }
+  }
+
+    .artifact-title {
+      font-size: 2.5rem;
+      color: #d4af37;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+  .quick-facts {
+    background-color: rgba(26, 26, 26, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    flex: 1;
+
+    h3 {
+      color: #d4af37;
+      font-size: 2.8rem;
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.3rem;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+        position: relative;
+
+        &:before {
+          content: '•';
+          color: #d4af37;
+          font-size: 1.3rem;
+          position: absolute;
+          left: 0;
+          top: -2px;
+        }
+
+        strong {
+          color: #d4af37;
+          font-weight: 550;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+// Make sure uploaded image displays correctly
+.artifact-image {
+  width: 100%;
+  height: 450px;
+  background-color: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .uploaded-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    svg {
+      filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+    }
+  }
+}
+  }
+
+  .right-panel {
+    background-color: rgba(26, 26, 26, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    height: calc(100vh - 120px);  // Fixed height to match left panel
+
+    .chat-header {
+      margin-bottom: 1.5rem;
+
+      h2 {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.5rem;
+        font-weight: 400;
+
+        .highlight {
+          color: #d4af37;
+        }
+      }
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1.5rem;
+      padding-right: 1rem;
+
+      .message {
+        margin-bottom: 1.2rem;
+        display: flex;
+        gap: 1rem;
+
+        &.assistant {
+          .avatar {
+            flex-shrink: 0;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            
+            svg {
+              filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+            }
+          }
+
+          .message-content {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        &.user {
+          justify-content: flex-end;
+
+          .message-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        .message-content {
+          padding: 1rem 1.5rem;  // Increased padding
+          border-radius: 12px;
+          max-width: 80%;
+          line-height: 1.6;  // Increased line height
+          font-size: 1.1rem;  // Increased from 0.95rem to 1.1rem
+        }
+      }
+    }
+
+    .suggested-questions {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+
+      .suggestion-btn {
+        background-color: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        padding: 0.7rem 1.5rem;  // Increased padding
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;  // Increased from 0.9rem to 1rem
+
+        &:hover {
+          background-color: rgba(212, 175, 55, 0.1);
+          border-color: #d4af37;
+          color: #d4af37;
+        }
+      }
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+
+      input {
+        flex: 1;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: white;
+        padding: 1rem 1.5rem;  // Increased padding
+        border-radius: 25px;
+        font-size: 1.05rem;  // Increased from 0.95rem to 1.05rem
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #d4af37;
+        }
+      }
+
+      .send-btn {
+        background-color: #d4af37;
+        color: #1a1a1a;
+        border: none;
+        padding: 1rem 2.5rem;  // Increased padding
+        border-radius: 25px;
+        font-size: 1.05rem;  // Increased from 0.95rem to 1.05rem
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: #f0c850;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .detail-container {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+
+    .left-panel,
+    .right-panel {
+      height: auto;
+    }
+
+    .left-panel .artifact-image {
+      height: 300px;
+    }
+  }
+}

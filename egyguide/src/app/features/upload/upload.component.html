@@ -1,0 +1,87 @@
+<!-- <div class="upload-container">
+  <div 
+    class="drop-zone"
+    [class.dragging]="isDragging()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="icon">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <path d="M30 40C30 35.5817 33.5817 32 38 32H58L70 44V72C70 76.4183 66.4183 80 62 80H38C33.5817 80 30 76.4183 30 72V40Z" 
+              stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="75" cy="45" r="8" fill="currentColor"/>
+        <path d="M85 50L75 60L65 50" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    
+    <h2>Drag & Drop your artifact image here</h2>
+    
+    <p class="or-text">or</p>
+    
+    <button class="browse-button" (click)="browseFiles()">
+      Browse Files
+    </button>
+    
+    <input 
+      type="file" 
+      id="fileInput" 
+      accept=".jpg,.jpeg,.png"
+      (change)="onFileSelect($event)"
+      style="display: none;"
+    >
+    
+    <p class="file-info">Supports JPG, PNG. Max size 10MB.</p>
+  </div>
+</div> -->
+
+
+<div class="upload-container">
+  <div
+    class="drop-zone"
+    [class.dragging]="isDragging()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="icon">
+      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+        <path d="M30 40C30 35.5817 33.5817 32 38 32H58L70 44V72C70 76.4183 66.4183 80 62 80H38C33.5817 80 30 76.4183 30 72V40Z"
+              stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="75" cy="45" r="8" fill="currentColor"/>
+        <path d="M85 50L75 60L65 50" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h2>{{ 'upload.dragDrop' | translate }}</h2>
+
+    <p class="or-text">{{ 'upload.or' | translate }}</p>
+
+    <button class="browse-button" (click)="browseFiles()">
+      {{ 'upload.browse' | translate }}
+    </button>
+
+    <input
+      type="file"
+      id="fileInput"
+      accept=".jpg,.jpeg,.png"
+      (change)="onFileSelect($event)"
+      style="display: none;"
+    >
+
+    <p class="file-info">{{ 'upload.fileInfo' | translate }}</p>
+  </div>
+  <div *ngIf="isUnknown()" class="unknown-card">
+    <div class="unknown-icon">
+      ⚠️
+    </div>
+
+    <h3>{{ 'upload.unknownTitle' | translate }}</h3>
+
+    <p>{{ 'upload.unknownText' | translate }}</p>
+
+    <button class="retry-btn" (click)="isUnknown.set(false)">
+      {{ 'upload.tryAgain' | translate }}
+    </button>
+  </div>
+</div>
