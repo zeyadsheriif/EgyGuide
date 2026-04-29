@@ -18,6 +18,7 @@
   },
   "upload": {
     "dragDrop": "Drag & Drop your artifact image here",
+    "takePhoto": "Take Photo",
     "or": "or",
     "browse": "Browse Files",
     "fileInfo": "Supports JPG, PNG. Max size 10MB.",

@@ -140,4 +140,76 @@
     background: #d4af37;
     color: #1a1a1a;
   }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .browse-button,
+  .camera-button {
+    background-color: transparent;
+    color: #d4af37;
+    border: 2px solid #d4af37;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    min-width: 200px; 
+  }
+
+  .browse-button:hover,
+  .camera-button:hover {
+    background-color: #d4af37;
+    color: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+  }
+
+  .camera-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .camera-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  video {
+    width: 400px;
+    max-width: 90vw;
+    border-radius: 12px;
+  }
+
+  .camera-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .capture-btn {
+    background: #d4af37;
+    color: black;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+  }
+
+  .cancel-btn {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+  }
 }

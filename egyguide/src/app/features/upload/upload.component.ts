@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject , ViewChild, ElementRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,6 +18,11 @@ export class UploadComponent {
 
   isUnknown = signal(false);
   isDragging = signal(false);
+
+  @ViewChild('videoRef') videoRef!: ElementRef<HTMLVideoElement>;
+
+  isCameraOpen = signal(false);
+  private stream: MediaStream | null = null;
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
@@ -94,5 +99,52 @@ export class UploadComponent {
 
   browseFiles(): void {
     document.getElementById('fileInput')?.click();
+  }
+
+  async startCamera(): Promise<void> {
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' } 
+      });
+
+      this.isCameraOpen.set(true);
+
+      setTimeout(() => {
+        if (this.videoRef) {
+          this.videoRef.nativeElement.srcObject = this.stream!;
+        }
+      });
+    } catch (error) {
+      console.error('Camera error:', error);
+    }
+  }
+
+  stopCamera(): void {
+    this.stream?.getTracks().forEach(track => track.stop());
+    this.stream = null;
+    this.isCameraOpen.set(false);
+  }
+
+  capturePhoto(): void {
+    const video = this.videoRef.nativeElement;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx?.drawImage(video, 0, 0);
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+
+      const file = new File([blob], 'camera.jpg', {
+        type: 'image/jpeg'
+      });
+
+      this.handleFile(file); 
+    }, 'image/jpeg', 0.9);
+
+    this.stopCamera();
   }
 }
