@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Home",
+    "chat": "Chat",
+    "history": "My History",
+    "about": "About"
+  },
+  "lang": {
+    "label": "Language",
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "home": {
+    "line1": "Unveil the Secrets of",
+    "line2": "Ancient Egypt",
+    "subtitle": "Your AI-powered guide to history's greatest monuments.",
+    "cta": "Start Exploring"
+  },
+  "upload": {
+    "dragDrop": "Drag & Drop your artifact image here",
+    "takePhoto": "Take Photo",
+    "or": "or",
+    "browse": "Browse Files",
+    "fileInfo": "Supports JPG, PNG. Max size 10MB.",
+    "unknownTitle": "Artifact Not Recognized",
+    "unknownText": "This image is not part of our trained Egyptian artifacts. Please try another image.",
+    "tryAgain": "Try Another Image"
+  },
+  "analyzing": {
+    "status": "Analyzing Artifact... Please wait."
+  },
+  "detail": {
+    "quickFacts": "Quick Facts",
+    "dynasty": "Dynasty",
+    "location": "Location",
+    "description": "Description",
+    "chatWith": "Chat with",
+    "placeholder": "Ask anything...",
+    "send": "Send",
+    "sending": "Sending...",
+    "suggestedQ1": "Tell me more about this artifact",
+    "suggestedQ2": "What is its dynasty?",
+    "suggestedQ3": "Where is it located?"
+  },
+  "chat": {
+    "title": "Chat with",
+    "highlight": "EgyGuide AI",
+    "subtitle": "Your personal guide to ancient Egyptian history",
+    "placeholder": "Ask anything about ancient Egypt...",
+    "send": "Send",
+    "sending": "Sending...",
+    "suggestedQ1": "Tell me about the pyramids of Giza",
+    "suggestedQ2": "Who was Cleopatra?",
+    "suggestedQ3": "Who is Ramessess II"
+  },
+  "history": {
+    "title": "My Exploration History",
+    "searchPlaceholder": "Search artifacts, locations, pharaohs...",
+    "sortByDate": "Sort by: Date",
+    "sortByName": "Sort by: Name",
+    "noResults": "No artifacts found",
+    "adjustSearch": "Try adjusting your search terms"
+  },
+  "about": {
+    "title": "About",
+    "highlight": "EgyGuide",
+    "subtitle": "Bringing Ancient Egypt to Life Through AI Technology",
+    "missionTitle": "Our Mission",
+    "missionText": "EgyGuide is an innovative AI-powered platform designed to make ancient Egyptian history accessible and engaging for everyone. By combining cutting-edge computer vision and natural language processing, we transform how people explore and learn about Egypt's magnificent artifacts and rich cultural heritage.",
+    "academicTitle": "Academic Project",
+    "university": "Zewail City University of Science and Technology",
+    "program": "Data Science & Artificial Intelligence Program",
+    "projectType": "Graduation Project 2026",
+    "projectDesc": "This project represents the culmination of our studies in AI and machine learning, combining theoretical knowledge with practical application to solve real-world challenges in cultural heritage preservation and education.",
+    "teamTitle": "Meet Our Team",
+    "teamIntro": "A passionate group of students dedicated to bridging technology and history",
+    "featuresTitle": "Key Features",
+    "feature1Title": "AI Recognition",
+    "feature1Desc": "Instantly identify Egyptian artifacts using advanced computer vision and deep learning models trained on thousands of historical objects.",
+    "feature2Title": "Interactive Chat",
+    "feature2Desc": "Engage in natural conversations with our AI guide powered by large language models fine-tuned on Egyptian history and culture.",
+    "feature3Title": "Rich History",
+    "feature3Desc": "Access detailed historical context, timelines, and cultural significance for every artifact and monument in our database.",
+    "techTitle": "Technology Stack",
+    "techDesc": "Built with modern AI technologies and frameworks",
+    "contactTitle": "Get In Touch",
+    "email": "Email",
+    "universityName": "Zewail City of Science and Technology",
+    "universityAddress": "Ahmed Zewail Road, October Gardens, 6th of October City, Giza, Egypt",
+    "programName": "B.Sc. Data Science & Artificial Intelligence",
+    "programClass": "Class of 2026",
+    "contactMessageTitle": "Interested in our project?",
+    "contactMessageText": "We welcome feedback, collaboration opportunities, and questions about EgyGuide. Whether you're an educator, historian, or technology enthusiast, we'd love to hear from you.",
+    "contactClosing": "This project is part of our ongoing commitment to using artificial intelligence for cultural preservation and education.",
+    "footerTagline": "Bridging the ancient and the modern through AI"
+  }
+}

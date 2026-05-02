@@ -1,0 +1,73 @@
+.analyzing-container {
+  min-height: 100vh;
+  background-color: #0f0f0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      rgba(212, 175, 55, 0.03) 0px,
+      transparent 1px,
+      transparent 40px,
+      rgba(212, 175, 55, 0.03) 41px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(212, 175, 55, 0.03) 0px,
+      transparent 1px,
+      transparent 40px,
+      rgba(212, 175, 55, 0.03) 41px
+    );
+
+  .content {
+    text-align: center;
+
+    .eye-icon {
+      margin-bottom: 4rem;
+      animation: pulse 2s ease-in-out infinite;
+
+      svg .glow {
+        filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.6))
+                drop-shadow(0 0 60px rgba(212, 175, 55, 0.4));
+      }
+    }
+
+    .progress-bar {
+      width: 500px;
+      height: 8px;
+      background-color: rgba(26, 26, 26, 0.8);
+      border: 2px solid rgba(212, 175, 55, 0.4);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0 auto 2rem;
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          rgba(212, 175, 55, 0.6),
+          #d4af37,
+          rgba(212, 175, 55, 0.6)
+        );
+        transition: width 0.3s ease-out;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+      }
+    }
+
+    .status-text {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.5rem;
+      font-weight: 300;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}

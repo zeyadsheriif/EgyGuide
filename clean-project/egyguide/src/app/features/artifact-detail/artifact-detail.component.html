@@ -1,0 +1,100 @@
+<div class="detail-container">
+  @if (artifact(); as art) {
+    <div class="left-panel">
+      <div class="artifact-image">
+        @if (art.imageUrl) {
+          <img [src]="art.imageUrl" [alt]="art.landmark" class="uploaded-image">
+        } @else {
+          <div class="image-placeholder">
+            <svg width="200" height="200" viewBox="0 0 100 100" fill="none">
+              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+            </svg>
+          </div>
+        }
+      </div>
+
+      <h1 class="artifact-title">{{ art.landmark }}</h1>
+
+      <div class="quick-facts">
+        <h3>{{ 'detail.quickFacts' | translate }}</h3>
+        <ul>
+          @if (art.dynasty) {
+            <li><strong>{{ 'detail.dynasty' | translate }}:</strong> {{ art.dynasty }}</li>
+          }
+          @if (art.location) {
+            <li><strong>{{ 'detail.location' | translate }}:</strong> {{ art.location }}</li>
+          }
+          @if (art.description) {
+            <li><strong>{{ 'detail.description' | translate }}:</strong> {{ art.description }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="chat-header">
+        <h2>{{ 'detail.chatWith' | translate }} <span class="highlight">EgyGuide AI</span></h2>
+      </div>
+
+      <div class="chat-messages">
+        @for (message of chatMessages(); track $index) {
+          <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+            @if (message.role === 'assistant') {
+              <div class="avatar">
+                <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+                  <path d="M 15 40 Q 50 20, 85 40"
+                        stroke="#d4af37"
+                        stroke-width="4"
+                        fill="none"
+                        stroke-linecap="round"/>
+                  <path d="M 15 40 Q 50 55, 85 40"
+                        stroke="#d4af37"
+                        stroke-width="4"
+                        fill="none"
+                        stroke-linecap="round"/>
+                  <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+                  <circle cx="50" cy="40" r="6" fill="#000"/>
+                  <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                        stroke="#d4af37"
+                        stroke-width="3.5"
+                        fill="none"
+                        stroke-linecap="round"/>
+                </svg>
+              </div>
+            }
+            <div class="message-content">
+              {{ message.content }}
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="suggested-questions">
+        @for (question of suggestedQuestions; track question) {
+          <button
+            class="suggestion-btn"
+            (click)="sendSuggestedQuestion(question)"
+          >
+            {{ question | translate }}
+          </button>
+        }
+      </div>
+
+      <div class="chat-input">
+        <input
+          type="text"
+          [placeholder]="'detail.placeholder' | translate"
+          [(ngModel)]="userMessage"
+          (keyup.enter)="sendMessage()"
+          [disabled]="isLoading()"
+        >
+        <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading()">
+          {{ (isLoading() ? 'detail.sending' : 'detail.send') | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,29 @@
+<header class="header">
+  <div class="logo">
+    <span class="logo-egy">Egy</span><span class="logo-guide">Guide</span>
+  </div>
+  <nav class="nav">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{ 'nav.home' | translate }}</a>
+    <a routerLink="/chat" routerLinkActive="active">{{ 'nav.chat' | translate }}</a>
+    <a routerLink="/history" routerLinkActive="active">{{ 'nav.history' | translate }}</a>
+    <a routerLink="/about" routerLinkActive="active">{{ 'nav.about' | translate }}</a>
+  </nav>
+
+  <div class="lang-switcher">
+    <button
+      class="lang-btn"
+      [class.active]="currentLang() === 'en'"
+      (click)="switchLanguage('en')"
+    >
+      EN
+    </button>
+    <span class="lang-divider">|</span>
+    <button
+      class="lang-btn"
+      [class.active]="currentLang() === 'ar'"
+      (click)="switchLanguage('ar')"
+    >
+      AR
+    </button>
+  </div>
+</header>
