@@ -1,0 +1,43 @@
+<div class="history-container">
+  <h1 class="page-title">{{ 'history.title' | translate }}</h1>
+
+  <div class="controls">
+    <div class="search-box">
+      <input
+        type="text"
+        [placeholder]="'history.searchPlaceholder' | translate"
+        (input)="onSearch($event)"
+        [value]="searchQuery()"
+      >
+    </div>
+
+    <div class="sort-box">
+      <select (change)="onSortChange($event)">
+        <option value="date">{{ 'history.sortByDate' | translate }}</option>
+        <option value="name">{{ 'history.sortByName' | translate }}</option>
+      </select>
+    </div>
+  </div>
+
+  @if (artifacts().length === 0) {
+    <div class="no-results">
+      <div class="no-results-icon">🔍</div>
+      <h3>{{ 'history.noResults' | translate }}</h3>
+      <p>{{ 'history.adjustSearch' | translate }}</p>
+    </div>
+  } @else {
+    <div class="artifacts-grid">
+      @for (artifact of artifacts(); track artifact.id) {
+        <div class="artifact-card" (click)="onArtifactClick(artifact.id)">
+          <div class="artifact-image">
+            <img [src]="artifact.imageUrl" [alt]="artifact.landmark">
+          </div>
+          <div class="artifact-info">
+            <h3>{{ artifact.landmark }}</h3>
+            <p class="date">{{ artifact.date }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

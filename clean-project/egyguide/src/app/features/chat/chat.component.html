@@ -1,0 +1,70 @@
+<div class="chat-page">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>{{ 'chat.title' | translate }} <span class="highlight">{{ 'chat.highlight' | translate }}</span></h1>
+      <p class="subtitle">{{ 'chat.subtitle' | translate }}</p>
+    </div>
+
+    <div class="chat-messages">
+      @for (message of chatMessages(); track $index) {
+        <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+          @if (message.role === 'assistant') {
+            <div class="avatar">
+              <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+                <!-- Eye of Horus -->
+                <path d="M 15 40 Q 50 20, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <path d="M 15 40 Q 50 55, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+                <circle cx="50" cy="40" r="6" fill="#000"/>
+                <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                      stroke="#d4af37"
+                      stroke-width="3.5"
+                      fill="none"
+                      stroke-linecap="round"/>
+              </svg>
+            </div>
+          }
+          <div class="message-content">
+            {{ message.content }}
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="suggested-questions">
+      @for (question of suggestedQuestions; track question) {
+        <button
+          class="suggestion-btn"
+          (click)="sendSuggestedQuestion(question)"
+        >
+          {{ question | translate }}
+        </button>
+      }
+    </div>
+
+    <div class="chat-input">
+      <input
+        type="text"
+        [placeholder]="'chat.placeholder' | translate"
+        [(ngModel)]="userMessage"
+        (keyup.enter)="sendMessage()"
+        [disabled]="isLoading()"
+      >
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="isLoading()"
+      >
+        {{ (isLoading() ? 'chat.sending' : 'chat.send') | translate }}
+      </button>
+    </div>
+  </div>
+</div>
