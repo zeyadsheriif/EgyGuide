@@ -89,7 +89,10 @@ src/app/shared/components/header/header.component.html
 src/app/shared/components/header/header.component.scss
 src/app/shared/components/header/header.component.ts
 src/assets/i18n/ar.json
+src/assets/i18n/de.json
 src/assets/i18n/en.json
+src/assets/i18n/fr.json
+src/assets/i18n/zh.json
 src/assets/images/1557ea79e1a820aad949c06bb6751ce9.jpg
 src/assets/images/dafuar.jpg
 src/assets/images/nefertiti.jpg
@@ -102,9 +105,7 @@ src/assets/images/tutankrimun.jpg
 src/environments/environment.development.ts
 src/environments/environment.ts
 src/index.html
-src/main.server.ts
 src/main.ts
-src/server.ts
 src/styles.scss
 tsconfig.app.json
 tsconfig.json
@@ -113,6 +114,681 @@ tsconfig.spec.json
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path=".editorconfig">
+# Editor configuration, see https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.ts]
+quote_type = single
+ij_typescript_use_double_quotes = false
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
+</file>
+
+<file path=".gitignore">
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+</file>
+
+<file path="angular.json">
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "egyguide": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "outputPath": "dist/egyguide",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "egyguide:build:production"
+            },
+            "development": {
+              "buildTarget": "egyguide:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  }
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "egyguide",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+    },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/forms": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@angular/platform-browser-dynamic": "^19.2.0",
+    "@angular/platform-server": "^19.2.0",
+    "@angular/router": "^19.2.0",
+    "@angular/ssr": "^19.2.20",
+    "@ngx-translate/core": "^17.0.0",
+    "@ngx-translate/http-loader": "^17.0.0",
+    "express": "^4.18.2",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.20",
+    "@angular/cli": "^19.2.20",
+    "@angular/compiler-cli": "^19.2.0",
+    "@types/express": "^4.17.17",
+    "@types/jasmine": "~5.1.0",
+    "@types/node": "^18.18.0",
+    "jasmine-core": "~5.6.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.7.2"
+  }
+}
+</file>
+
+<file path="README.md">
+# Egyguide
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.20.
+
+## Development server
+
+To start a local development server, run:
+
+```bash
+ng serve
+```
+
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+## Code scaffolding
+
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+
+```bash
+ng generate component component-name
+```
+
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+
+```bash
+ng generate --help
+```
+
+## Building
+
+To build the project run:
+
+```bash
+ng build
+```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+</file>
+
+<file path="src/app/app.component.html">
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
+<!-- * * * * * * * to get started with your project! * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<style>
+  :host {
+    --bright-blue: oklch(51.01% 0.274 263.83);
+    --electric-violet: oklch(53.18% 0.28 296.97);
+    --french-violet: oklch(47.66% 0.246 305.88);
+    --vivid-pink: oklch(69.02% 0.277 332.77);
+    --hot-red: oklch(61.42% 0.238 15.34);
+    --orange-red: oklch(63.32% 0.24 31.68);
+
+    --gray-900: oklch(19.37% 0.006 300.98);
+    --gray-700: oklch(36.98% 0.014 302.71);
+    --gray-400: oklch(70.9% 0.015 304.04);
+
+    --red-to-pink-to-purple-vertical-gradient: linear-gradient(
+      180deg,
+      var(--orange-red) 0%,
+      var(--vivid-pink) 50%,
+      var(--electric-violet) 100%
+    );
+
+    --red-to-pink-to-purple-horizontal-gradient: linear-gradient(
+      90deg,
+      var(--orange-red) 0%,
+      var(--vivid-pink) 50%,
+      var(--electric-violet) 100%
+    );
+
+    --pill-accent: var(--bright-blue);
+
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1 {
+    font-size: 3.125rem;
+    color: var(--gray-900);
+    font-weight: 500;
+    line-height: 100%;
+    letter-spacing: -0.125rem;
+    margin: 0;
+    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+  }
+
+  p {
+    margin: 0;
+    color: var(--gray-700);
+  }
+
+  main {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: inherit;
+    position: relative;
+  }
+
+  .angular-logo {
+    max-width: 9.2rem;
+  }
+
+  .content {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+
+  .content h1 {
+    margin-top: 1.75rem;
+  }
+
+  .content p {
+    margin-top: 1.5rem;
+  }
+
+  .divider {
+    width: 1px;
+    background: var(--red-to-pink-to-purple-vertical-gradient);
+    margin-inline: 0.5rem;
+  }
+
+  .pill-group {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .pill {
+    display: flex;
+    align-items: center;
+    --pill-accent: var(--bright-blue);
+    background: color-mix(in srgb, var(--pill-accent) 5%, transparent);
+    color: var(--pill-accent);
+    padding-inline: 0.75rem;
+    padding-block: 0.375rem;
+    border-radius: 2.75rem;
+    border: 0;
+    transition: background 0.3s ease;
+    font-family: var(--inter-font);
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.4rem;
+    letter-spacing: -0.00875rem;
+    text-decoration: none;
+  }
+
+  .pill:hover {
+    background: color-mix(in srgb, var(--pill-accent) 15%, transparent);
+  }
+
+  .pill-group .pill:nth-child(6n + 1) {
+    --pill-accent: var(--bright-blue);
+  }
+  .pill-group .pill:nth-child(6n + 2) {
+    --pill-accent: var(--french-violet);
+  }
+  .pill-group .pill:nth-child(6n + 3),
+  .pill-group .pill:nth-child(6n + 4),
+  .pill-group .pill:nth-child(6n + 5) {
+    --pill-accent: var(--hot-red);
+  }
+
+  .pill-group svg {
+    margin-inline-start: 0.25rem;
+  }
+
+  .social-links {
+    display: flex;
+    align-items: center;
+    gap: 0.73rem;
+    margin-top: 1.5rem;
+  }
+
+  .social-links path {
+    transition: fill 0.3s ease;
+    fill: var(--gray-400);
+  }
+
+  .social-links a:hover svg path {
+    fill: var(--gray-900);
+  }
+
+  @media screen and (max-width: 650px) {
+    .content {
+      flex-direction: column;
+      width: max-content;
+    }
+
+    .divider {
+      height: 1px;
+      width: 100%;
+      background: var(--red-to-pink-to-purple-horizontal-gradient);
+      margin-block: 1.5rem;
+    }
+  }
+</style>
+
+<main class="main">
+  <div class="content">
+    <div class="left-side">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 982 239"
+        fill="none"
+        class="angular-logo"
+      >
+        <g clip-path="url(#a)">
+          <path
+            fill="url(#b)"
+            d="M388.676 191.625h30.849L363.31 31.828h-35.758l-56.215 159.797h30.848l13.174-39.356h60.061l13.256 39.356Zm-65.461-62.675 21.602-64.311h1.227l21.602 64.311h-44.431Zm126.831-7.527v70.202h-28.23V71.839h27.002v20.374h1.392c2.782-6.71 7.2-12.028 13.255-15.956 6.056-3.927 13.584-5.89 22.503-5.89 8.264 0 15.465 1.8 21.684 5.318 6.137 3.518 10.964 8.673 14.319 15.382 3.437 6.71 5.074 14.81 4.992 24.383v76.175h-28.23v-71.92c0-8.019-2.046-14.237-6.219-18.819-4.173-4.5-9.819-6.791-17.102-6.791-4.91 0-9.328 1.063-13.174 3.272-3.846 2.128-6.792 5.237-9.001 9.328-2.046 4.009-3.191 8.918-3.191 14.728ZM589.233 239c-10.147 0-18.82-1.391-26.103-4.091-7.282-2.7-13.092-6.382-17.511-10.964-4.418-4.582-7.528-9.655-9.164-15.219l25.448-6.136c1.145 2.372 2.782 4.663 4.991 6.954 2.209 2.291 5.155 4.255 8.837 5.81 3.683 1.554 8.428 2.291 14.074 2.291 8.019 0 14.647-1.964 19.884-5.81 5.237-3.845 7.856-10.227 7.856-19.064v-22.665h-1.391c-1.473 2.946-3.601 5.892-6.383 9.001-2.782 3.109-6.464 5.645-10.965 7.691-4.582 2.046-10.228 3.109-17.101 3.109-9.165 0-17.511-2.209-25.039-6.545-7.446-4.337-13.42-10.883-17.757-19.474-4.418-8.673-6.628-19.473-6.628-32.565 0-13.091 2.21-24.301 6.628-33.383 4.419-9.082 10.311-15.955 17.839-20.7 7.528-4.746 15.874-7.037 25.039-7.037 7.037 0 12.846 1.145 17.347 3.518 4.582 2.373 8.182 5.236 10.883 8.51 2.7 3.272 4.746 6.382 6.137 9.327h1.554v-19.8h27.821v121.749c0 10.228-2.454 18.737-7.364 25.447-4.91 6.709-11.538 11.7-20.048 15.055-8.509 3.355-18.165 4.991-28.884 4.991Zm.245-71.266c5.974 0 11.047-1.473 15.302-4.337 4.173-2.945 7.446-7.118 9.573-12.519 2.21-5.482 3.274-12.027 3.274-19.637 0-7.609-1.064-14.155-3.274-19.8-2.127-5.646-5.318-10.064-9.491-13.255-4.174-3.11-9.329-4.746-15.384-4.746s-11.537 1.636-15.792 4.91c-4.173 3.272-7.365 7.772-9.492 13.418-2.128 5.727-3.191 12.191-3.191 19.392 0 7.2 1.063 13.745 3.273 19.228 2.127 5.482 5.318 9.736 9.573 12.764 4.174 3.027 9.41 4.582 15.629 4.582Zm141.56-26.51V71.839h28.23v119.786h-27.412v-21.273h-1.227c-2.7 6.709-7.119 12.191-13.338 16.446-6.137 4.255-13.747 6.382-22.748 6.382-7.855 0-14.81-1.718-20.783-5.237-5.974-3.518-10.72-8.591-14.075-15.382-3.355-6.709-5.073-14.891-5.073-24.464V71.839h28.312v71.921c0 7.609 2.046 13.664 6.219 18.083 4.173 4.5 9.655 6.709 16.365 6.709 4.173 0 8.183-.982 12.111-3.028 3.927-2.045 7.118-5.072 9.655-9.082 2.537-4.091 3.764-9.164 3.764-15.218Zm65.707-109.395v159.796h-28.23V31.828h28.23Zm44.841 162.169c-7.61 0-14.402-1.391-20.457-4.091-6.055-2.7-10.883-6.791-14.32-12.109-3.518-5.319-5.237-11.946-5.237-19.801 0-6.791 1.228-12.355 3.765-16.773 2.536-4.419 5.891-7.937 10.228-10.637 4.337-2.618 9.164-4.664 14.647-6.055 5.4-1.391 11.046-2.373 16.856-3.027 7.037-.737 12.683-1.391 17.102-1.964 4.337-.573 7.528-1.555 9.574-2.782 1.963-1.309 3.027-3.273 3.027-5.973v-.491c0-5.891-1.718-10.391-5.237-13.664-3.518-3.191-8.51-4.828-15.056-4.828-6.955 0-12.356 1.473-16.447 4.5-4.009 3.028-6.71 6.546-8.183 10.719l-26.348-3.764c2.046-7.282 5.483-13.336 10.31-18.328 4.746-4.909 10.638-8.59 17.511-11.045 6.955-2.455 14.565-3.682 22.912-3.682 5.809 0 11.537.654 17.265 2.045s10.965 3.6 15.711 6.71c4.746 3.109 8.51 7.282 11.455 12.6 2.864 5.318 4.337 11.946 4.337 19.883v80.184h-27.166v-16.446h-.9c-1.719 3.355-4.092 6.464-7.201 9.328-3.109 2.864-6.955 5.237-11.619 6.955-4.828 1.718-10.229 2.536-16.529 2.536Zm7.364-20.701c5.646 0 10.556-1.145 14.729-3.354 4.173-2.291 7.364-5.237 9.655-9.001 2.292-3.763 3.355-7.854 3.355-12.273v-14.155c-.9.737-2.373 1.391-4.5 2.046-2.128.654-4.419 1.145-7.037 1.636-2.619.491-5.155.9-7.692 1.227-2.537.328-4.746.655-6.628.901-4.173.572-8.019 1.472-11.292 2.781-3.355 1.31-5.973 3.11-7.855 5.401-1.964 2.291-2.864 5.318-2.864 8.918 0 5.237 1.882 9.164 5.728 11.782 3.682 2.782 8.51 4.091 14.401 4.091Zm64.643 18.328V71.839h27.412v19.965h1.227c2.21-6.955 5.974-12.274 11.292-16.038 5.319-3.763 11.456-5.645 18.329-5.645 1.555 0 3.355.082 5.237.163 1.964.164 3.601.328 4.91.573v25.938c-1.227-.41-3.109-.819-5.646-1.146a58.814 58.814 0 0 0-7.446-.49c-5.155 0-9.738 1.145-13.829 3.354-4.091 2.209-7.282 5.236-9.655 9.164-2.373 3.927-3.519 8.427-3.519 13.5v70.448h-28.312ZM222.077 39.192l-8.019 125.923L137.387 0l84.69 39.192Zm-53.105 162.825-57.933 33.056-57.934-33.056 11.783-28.556h92.301l11.783 28.556ZM111.039 62.675l30.357 73.803H80.681l30.358-73.803ZM7.937 165.115 0 39.192 84.69 0 7.937 165.115Z"
+          />
+          <path
+            fill="url(#c)"
+            d="M388.676 191.625h30.849L363.31 31.828h-35.758l-56.215 159.797h30.848l13.174-39.356h60.061l13.256 39.356Zm-65.461-62.675 21.602-64.311h1.227l21.602 64.311h-44.431Zm126.831-7.527v70.202h-28.23V71.839h27.002v20.374h1.392c2.782-6.71 7.2-12.028 13.255-15.956 6.056-3.927 13.584-5.89 22.503-5.89 8.264 0 15.465 1.8 21.684 5.318 6.137 3.518 10.964 8.673 14.319 15.382 3.437 6.71 5.074 14.81 4.992 24.383v76.175h-28.23v-71.92c0-8.019-2.046-14.237-6.219-18.819-4.173-4.5-9.819-6.791-17.102-6.791-4.91 0-9.328 1.063-13.174 3.272-3.846 2.128-6.792 5.237-9.001 9.328-2.046 4.009-3.191 8.918-3.191 14.728ZM589.233 239c-10.147 0-18.82-1.391-26.103-4.091-7.282-2.7-13.092-6.382-17.511-10.964-4.418-4.582-7.528-9.655-9.164-15.219l25.448-6.136c1.145 2.372 2.782 4.663 4.991 6.954 2.209 2.291 5.155 4.255 8.837 5.81 3.683 1.554 8.428 2.291 14.074 2.291 8.019 0 14.647-1.964 19.884-5.81 5.237-3.845 7.856-10.227 7.856-19.064v-22.665h-1.391c-1.473 2.946-3.601 5.892-6.383 9.001-2.782 3.109-6.464 5.645-10.965 7.691-4.582 2.046-10.228 3.109-17.101 3.109-9.165 0-17.511-2.209-25.039-6.545-7.446-4.337-13.42-10.883-17.757-19.474-4.418-8.673-6.628-19.473-6.628-32.565 0-13.091 2.21-24.301 6.628-33.383 4.419-9.082 10.311-15.955 17.839-20.7 7.528-4.746 15.874-7.037 25.039-7.037 7.037 0 12.846 1.145 17.347 3.518 4.582 2.373 8.182 5.236 10.883 8.51 2.7 3.272 4.746 6.382 6.137 9.327h1.554v-19.8h27.821v121.749c0 10.228-2.454 18.737-7.364 25.447-4.91 6.709-11.538 11.7-20.048 15.055-8.509 3.355-18.165 4.991-28.884 4.991Zm.245-71.266c5.974 0 11.047-1.473 15.302-4.337 4.173-2.945 7.446-7.118 9.573-12.519 2.21-5.482 3.274-12.027 3.274-19.637 0-7.609-1.064-14.155-3.274-19.8-2.127-5.646-5.318-10.064-9.491-13.255-4.174-3.11-9.329-4.746-15.384-4.746s-11.537 1.636-15.792 4.91c-4.173 3.272-7.365 7.772-9.492 13.418-2.128 5.727-3.191 12.191-3.191 19.392 0 7.2 1.063 13.745 3.273 19.228 2.127 5.482 5.318 9.736 9.573 12.764 4.174 3.027 9.41 4.582 15.629 4.582Zm141.56-26.51V71.839h28.23v119.786h-27.412v-21.273h-1.227c-2.7 6.709-7.119 12.191-13.338 16.446-6.137 4.255-13.747 6.382-22.748 6.382-7.855 0-14.81-1.718-20.783-5.237-5.974-3.518-10.72-8.591-14.075-15.382-3.355-6.709-5.073-14.891-5.073-24.464V71.839h28.312v71.921c0 7.609 2.046 13.664 6.219 18.083 4.173 4.5 9.655 6.709 16.365 6.709 4.173 0 8.183-.982 12.111-3.028 3.927-2.045 7.118-5.072 9.655-9.082 2.537-4.091 3.764-9.164 3.764-15.218Zm65.707-109.395v159.796h-28.23V31.828h28.23Zm44.841 162.169c-7.61 0-14.402-1.391-20.457-4.091-6.055-2.7-10.883-6.791-14.32-12.109-3.518-5.319-5.237-11.946-5.237-19.801 0-6.791 1.228-12.355 3.765-16.773 2.536-4.419 5.891-7.937 10.228-10.637 4.337-2.618 9.164-4.664 14.647-6.055 5.4-1.391 11.046-2.373 16.856-3.027 7.037-.737 12.683-1.391 17.102-1.964 4.337-.573 7.528-1.555 9.574-2.782 1.963-1.309 3.027-3.273 3.027-5.973v-.491c0-5.891-1.718-10.391-5.237-13.664-3.518-3.191-8.51-4.828-15.056-4.828-6.955 0-12.356 1.473-16.447 4.5-4.009 3.028-6.71 6.546-8.183 10.719l-26.348-3.764c2.046-7.282 5.483-13.336 10.31-18.328 4.746-4.909 10.638-8.59 17.511-11.045 6.955-2.455 14.565-3.682 22.912-3.682 5.809 0 11.537.654 17.265 2.045s10.965 3.6 15.711 6.71c4.746 3.109 8.51 7.282 11.455 12.6 2.864 5.318 4.337 11.946 4.337 19.883v80.184h-27.166v-16.446h-.9c-1.719 3.355-4.092 6.464-7.201 9.328-3.109 2.864-6.955 5.237-11.619 6.955-4.828 1.718-10.229 2.536-16.529 2.536Zm7.364-20.701c5.646 0 10.556-1.145 14.729-3.354 4.173-2.291 7.364-5.237 9.655-9.001 2.292-3.763 3.355-7.854 3.355-12.273v-14.155c-.9.737-2.373 1.391-4.5 2.046-2.128.654-4.419 1.145-7.037 1.636-2.619.491-5.155.9-7.692 1.227-2.537.328-4.746.655-6.628.901-4.173.572-8.019 1.472-11.292 2.781-3.355 1.31-5.973 3.11-7.855 5.401-1.964 2.291-2.864 5.318-2.864 8.918 0 5.237 1.882 9.164 5.728 11.782 3.682 2.782 8.51 4.091 14.401 4.091Zm64.643 18.328V71.839h27.412v19.965h1.227c2.21-6.955 5.974-12.274 11.292-16.038 5.319-3.763 11.456-5.645 18.329-5.645 1.555 0 3.355.082 5.237.163 1.964.164 3.601.328 4.91.573v25.938c-1.227-.41-3.109-.819-5.646-1.146a58.814 58.814 0 0 0-7.446-.49c-5.155 0-9.738 1.145-13.829 3.354-4.091 2.209-7.282 5.236-9.655 9.164-2.373 3.927-3.519 8.427-3.519 13.5v70.448h-28.312ZM222.077 39.192l-8.019 125.923L137.387 0l84.69 39.192Zm-53.105 162.825-57.933 33.056-57.934-33.056 11.783-28.556h92.301l11.783 28.556ZM111.039 62.675l30.357 73.803H80.681l30.358-73.803ZM7.937 165.115 0 39.192 84.69 0 7.937 165.115Z"
+          />
+        </g>
+        <defs>
+          <radialGradient
+            id="c"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientTransform="rotate(118.122 171.182 60.81) scale(205.794)"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#FF41F8" />
+            <stop offset=".707" stop-color="#FF41F8" stop-opacity=".5" />
+            <stop offset="1" stop-color="#FF41F8" stop-opacity="0" />
+          </radialGradient>
+          <linearGradient
+            id="b"
+            x1="0"
+            x2="982"
+            y1="192"
+            y2="192"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#F0060B" />
+            <stop offset="0" stop-color="#F0070C" />
+            <stop offset=".526" stop-color="#CC26D5" />
+            <stop offset="1" stop-color="#7702FF" />
+          </linearGradient>
+          <clipPath id="a"><path fill="#fff" d="M0 0h982v239H0z" /></clipPath>
+        </defs>
+      </svg>
+      <h1>Hello, {{ title }}</h1>
+      <p>Congratulations! Your app is running. 🎉</p>
+    </div>
+    <div class="divider" role="separator" aria-label="Divider"></div>
+    <div class="right-side">
+      <div class="pill-group">
+        @for (item of [
+          { title: 'Explore the Docs', link: 'https://angular.dev' },
+          { title: 'Learn with Tutorials', link: 'https://angular.dev/tutorials' },
+          { title: 'CLI Docs', link: 'https://angular.dev/tools/cli' },
+          { title: 'Angular Language Service', link: 'https://angular.dev/tools/language-service' },
+          { title: 'Angular DevTools', link: 'https://angular.dev/tools/devtools' },
+        ]; track item.title) {
+          <a
+            class="pill"
+            [href]="item.link"
+            target="_blank"
+            rel="noopener"
+          >
+            <span>{{ item.title }}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="14"
+              viewBox="0 -960 960 960"
+              width="14"
+              fill="currentColor"
+            >
+              <path
+                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
+              />
+            </svg>
+          </a>
+        }
+      </div>
+      <div class="social-links">
+        <a
+          href="https://github.com/angular/angular"
+          aria-label="Github"
+          target="_blank"
+          rel="noopener"
+        >
+          <svg
+            width="25"
+            height="24"
+            viewBox="0 0 25 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            alt="Github"
+          >
+            <path
+              d="M12.3047 0C5.50634 0 0 5.50942 0 12.3047C0 17.7423 3.52529 22.3535 8.41332 23.9787C9.02856 24.0946 9.25414 23.7142 9.25414 23.3871C9.25414 23.0949 9.24389 22.3207 9.23876 21.2953C5.81601 22.0377 5.09414 19.6444 5.09414 19.6444C4.53427 18.2243 3.72524 17.8449 3.72524 17.8449C2.61064 17.082 3.81137 17.0973 3.81137 17.0973C5.04697 17.1835 5.69604 18.3647 5.69604 18.3647C6.79321 20.2463 8.57636 19.7029 9.27978 19.3881C9.39052 18.5924 9.70736 18.0499 10.0591 17.7423C7.32641 17.4347 4.45429 16.3765 4.45429 11.6618C4.45429 10.3185 4.9311 9.22133 5.72065 8.36C5.58222 8.04931 5.16694 6.79833 5.82831 5.10337C5.82831 5.10337 6.85883 4.77319 9.2121 6.36459C10.1965 6.09082 11.2424 5.95546 12.2883 5.94931C13.3342 5.95546 14.3801 6.09082 15.3644 6.36459C17.7023 4.77319 18.7328 5.10337 18.7328 5.10337C19.3942 6.79833 18.9789 8.04931 18.8559 8.36C19.6403 9.22133 20.1171 10.3185 20.1171 11.6618C20.1171 16.3888 17.2409 17.4296 14.5031 17.7321C14.9338 18.1012 15.3337 18.8559 15.3337 20.0084C15.3337 21.6552 15.3183 22.978 15.3183 23.3779C15.3183 23.7009 15.5336 24.0854 16.1642 23.9623C21.0871 22.3484 24.6094 17.7341 24.6094 12.3047C24.6094 5.50942 19.0999 0 12.3047 0Z"
+            />
+          </svg>
+        </a>
+        <a
+          href="https://twitter.com/angular"
+          aria-label="Twitter"
+          target="_blank"
+          rel="noopener"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            alt="Twitter"
+          >
+            <path
+              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+            />
+          </svg>
+        </a>
+        <a
+          href="https://www.youtube.com/channel/UCbn1OgGei-DV7aSRo_HaAiw"
+          aria-label="Youtube"
+          target="_blank"
+          rel="noopener"
+        >
+          <svg
+            width="29"
+            height="20"
+            viewBox="0 0 29 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            alt="Youtube"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M27.4896 1.52422C27.9301 1.96749 28.2463 2.51866 28.4068 3.12258C29.0004 5.35161 29.0004 10 29.0004 10C29.0004 10 29.0004 14.6484 28.4068 16.8774C28.2463 17.4813 27.9301 18.0325 27.4896 18.4758C27.0492 18.9191 26.5 19.2389 25.8972 19.4032C23.6778 20 14.8068 20 14.8068 20C14.8068 20 5.93586 20 3.71651 19.4032C3.11363 19.2389 2.56449 18.9191 2.12405 18.4758C1.68361 18.0325 1.36732 17.4813 1.20683 16.8774C0.613281 14.6484 0.613281 10 0.613281 10C0.613281 10 0.613281 5.35161 1.20683 3.12258C1.36732 2.51866 1.68361 1.96749 2.12405 1.52422C2.56449 1.08095 3.11363 0.76113 3.71651 0.596774C5.93586 0 14.8068 0 14.8068 0C14.8068 0 23.6778 0 25.8972 0.596774C26.5 0.76113 27.0492 1.08095 27.4896 1.52422ZM19.3229 10L11.9036 5.77905V14.221L19.3229 10Z"
+            />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+
+<router-outlet />
+</file>
+
+<file path="src/app/app.component.scss">
+
+</file>
+
+<file path="src/app/app.component.spec.ts">
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+</file>
+
+<file path="src/app/app.component.ts">
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './shared/components/header/header.component';
+import { LanguageService } from './core/services/language.service';
+⋮----
+export class AppComponent {
+⋮----
+ngOnInit(): void
+</file>
+
+<file path="src/app/app.config.server.ts">
+import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { provideServerRendering } from '@angular/platform-server';
+import { provideServerRouting } from '@angular/ssr';
+import { appConfig } from './app.config';
+import { serverRoutes } from './app.routes.server';
+</file>
+
+<file path="src/app/app.config.ts">
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, HttpClient } from '@angular/common/http';
+import { routes } from './app.routes';
+⋮----
+import { importProvidersFrom } from '@angular/core';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+⋮----
+export class JsonLoader implements TranslateLoader {
+⋮----
+constructor(private http: HttpClient)
+⋮----
+getTranslation(lang: string): Observable<any>
+</file>
+
+<file path="src/app/app.routes.server.ts">
+import { RenderMode, ServerRoute } from '@angular/ssr';
+</file>
+
+<file path="src/app/app.routes.ts">
+import { Routes } from '@angular/router';
+⋮----
+loadComponent: () => import('./features/about/about.component').then(c => c.AboutComponent)  // Updated
+</file>
 
 <file path="src/app/core/enums/routes.enum.ts">
 export enum AppRoutes {
@@ -212,6 +888,8 @@ export class LanguageService {
 init(): void
 ⋮----
 setLanguage(lang: string): void
+⋮----
+// Only Arabic is RTL
 ⋮----
 get isRtl(): boolean
 </file>
@@ -377,30 +1055,32 @@ get isRtl(): boolean
   <!-- Contact Section with Egyptian Icons -->
   <section class="contact-section">
     <div class="content-wrapper">
-      <h2 class="section-title">Get In Touch</h2>
+      <h2 class="section-title">{{ 'about.contactTitle' | translate }}</h2>
+
       <div class="contact-content">
+        <!-- LEFT: INFO -->
         <div class="contact-info">
+
+          <!-- Email -->
           <div class="info-item">
             <div class="info-icon">
-              <!-- Email Eye with @ symbol -->
               <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
                 <path d="M 15 50 Q 50 25, 85 50" stroke="#d4af37" stroke-width="3.5" fill="none" stroke-linecap="round"/>
                 <path d="M 15 50 Q 50 70, 85 50" stroke="#d4af37" stroke-width="3.5" fill="none" stroke-linecap="round"/>
                 <circle cx="50" cy="50" r="12" fill="#d4af37"/>
                 <circle cx="50" cy="50" r="6" fill="#1a1a1a"/>
-                <!-- @ symbol -->
                 <text x="50" y="85" font-size="20" fill="#d4af37" text-anchor="middle" font-family="Arial">&#64;</text>
               </svg>
             </div>
             <div class="info-details">
-              <h4>Email</h4>
+              <h4>{{ 'about.email' | translate }}</h4>
               <p>egyguide.team&#64;zewailcity.edu.eg</p>
             </div>
           </div>
 
+          <!-- University -->
           <div class="info-item">
             <div class="info-icon">
-              <!-- Pyramid for University -->
               <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
                 <path d="M 50 20 L 85 75 L 15 75 Z" stroke="#d4af37" stroke-width="3" fill="none"/>
                 <path d="M 50 20 L 50 75" stroke="#d4af37" stroke-width="2"/>
@@ -409,15 +1089,15 @@ get isRtl(): boolean
               </svg>
             </div>
             <div class="info-details">
-              <h4>University</h4>
-              <p>Zewail City of Science and Technology</p>
-              <p class="sub-text">Ahmed Zewail Road, October Gardens, 6th of October City, Giza, Egypt</p>
+              <h4>{{ 'about.university' | translate }}</h4>
+              <p>{{ 'about.universityName' | translate }}</p>
+              <p class="sub-text">{{ 'about.universityAddress' | translate }}</p>
             </div>
           </div>
 
+          <!-- Program -->
           <div class="info-item">
             <div class="info-icon">
-              <!-- Ankh for Program -->
               <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
                 <circle cx="50" cy="30" r="12" stroke="#d4af37" stroke-width="3" fill="none"/>
                 <line x1="50" y1="42" x2="50" y2="85" stroke="#d4af37" stroke-width="3"/>
@@ -426,26 +1106,29 @@ get isRtl(): boolean
               </svg>
             </div>
             <div class="info-details">
-              <h4>Program</h4>
-              <p>B.Sc. Data Science & Artificial Intelligence</p>
-              <p class="sub-text">Class of 2026</p>
+              <h4>{{ 'about.program' | translate }}</h4>
+              <p>{{ 'about.programName' | translate }}</p>
+              <p class="sub-text">{{ 'about.programClass' | translate }}</p>
             </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: MESSAGE -->
+        <div class="contact-message">
+          <div class="message-box">
+            <h3>{{ 'about.contactMessageTitle' | translate }}</h3>
+
+            <p>
+              {{ 'about.contactMessageText' | translate }}
+            </p>
+
+            <p class="closing-text">
+              {{ 'about.contactClosing' | translate }}
+            </p>
           </div>
         </div>
 
-        <div class="contact-message">
-          <div class="message-box">
-            <h3>Interested in our project?</h3>
-            <p>
-              We welcome feedback, collaboration opportunities, and questions about EgyGuide.
-              Whether you're an educator, historian, or technology enthusiast, we'd love to hear from you.
-            </p>
-            <p class="closing-text">
-              This project is part of our ongoing commitment to using artificial intelligence
-              for cultural preservation and education.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -1458,6 +2141,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
 import { Artifact, ChatMessage } from '../../core/models/artifact.model';
+import { TranslateService } from '@ngx-translate/core';
 ⋮----
 export class ArtifactDetailComponent implements OnInit {
 ⋮----
@@ -1790,7 +2474,7 @@ sendSuggestedQuestion(questionKey: string): void
 import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
 import { ChatMessage } from '../../core/models/artifact.model';
 ⋮----
@@ -2422,45 +3106,9 @@ startExploring()
 </file>
 
 <file path="src/app/features/upload/upload.component.html">
-<!-- <div class="upload-container">
-  <div 
-    class="drop-zone"
-    [class.dragging]="isDragging()"
-    (dragover)="onDragOver($event)"
-    (dragleave)="onDragLeave($event)"
-    (drop)="onDrop($event)"
-  >
-    <div class="icon">
-      <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
-        <path d="M30 40C30 35.5817 33.5817 32 38 32H58L70 44V72C70 76.4183 66.4183 80 62 80H38C33.5817 80 30 76.4183 30 72V40Z" 
-              stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="75" cy="45" r="8" fill="currentColor"/>
-        <path d="M85 50L75 60L65 50" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    
-    <h2>Drag & Drop your artifact image here</h2>
-    
-    <p class="or-text">or</p>
-    
-    <button class="browse-button" (click)="browseFiles()">
-      Browse Files
-    </button>
-    
-    <input 
-      type="file" 
-      id="fileInput" 
-      accept=".jpg,.jpeg,.png"
-      (change)="onFileSelect($event)"
-      style="display: none;"
-    >
-    
-    <p class="file-info">Supports JPG, PNG. Max size 10MB.</p>
-  </div>
-</div> -->
-
-
 <div class="upload-container">
+
+  <!--  DROP ZONE -->
   <div
     class="drop-zone"
     [class.dragging]="isDragging()"
@@ -2481,20 +3129,45 @@ startExploring()
 
     <p class="or-text">{{ 'upload.or' | translate }}</p>
 
-    <button class="browse-button" (click)="browseFiles()">
-      {{ 'upload.browse' | translate }}
-    </button>
+    <div class="actions">
+      <button class="browse-button" (click)="browseFiles()">
+        {{ 'upload.browse' | translate }}
+      </button>
+      <button class="camera-button" (click)="startCamera()">
+        {{ 'upload.takePhoto' | translate }}
+      </button>
+    </div>
 
-    <input
-      type="file"
-      id="fileInput"
-      accept=".jpg,.jpeg,.png"
-      (change)="onFileSelect($event)"
-      style="display: none;"
-    >
+    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" (change)="onFileSelect($event)" hidden>
 
     <p class="file-info">{{ 'upload.fileInfo' | translate }}</p>
   </div>
+
+  <!-- UNKNOWN RESULT -->
+  <div *ngIf="isUnknown()" class="unknown-card">
+    <div class="unknown-icon">⚠️</div>
+    <h3>{{ 'upload.unknownTitle' | translate }}</h3>
+    <p>{{ 'upload.unknownText' | translate }}</p>
+    <button class="retry-btn" (click)="isUnknown.set(false)">
+      {{ 'upload.tryAgain' | translate }}
+    </button>
+  </div>
+
+  <!-- CAMERA MODAL -->
+  <div class="camera-modal" *ngIf="isCameraOpen()">
+    <div class="camera-container">
+      <video #videoRef autoplay playsinline></video>
+      <div class="camera-actions">
+        <button class="capture-btn" (click)="capturePhoto()">
+          {{ 'upload.capture' | translate }}
+        </button>
+        <button class="cancel-btn" (click)="stopCamera()">
+          {{ 'upload.cancel' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>
 </file>
 
@@ -2594,11 +3267,130 @@ startExploring()
     margin-bottom: 1.5rem;
     text-align: center;
   }
+  .unknown-card {
+    margin-top: 30px;
+    padding: 2rem;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    background: rgba(26, 26, 26, 0.7);
+    text-align: center;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .unknown-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #d4af37;
+  }
+
+  .unknown-card h3 {
+    color: #d4af37;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .unknown-card p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .retry-btn {
+    background: transparent;
+    border: 1px solid #d4af37;
+    color: #d4af37;
+    padding: 0.7rem 1.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .retry-btn:hover {
+    background: #d4af37;
+    color: #1a1a1a;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  .browse-button,
+  .camera-button {
+    background-color: transparent;
+    color: #d4af37;
+    border: 2px solid #d4af37;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+    min-width: 200px; 
+  }
+
+  .browse-button:hover,
+  .camera-button:hover {
+    background-color: #d4af37;
+    color: #1a1a1a;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3);
+  }
+
+  .camera-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .camera-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  video {
+    width: 400px;
+    max-width: 90vw;
+    border-radius: 12px;
+  }
+
+  .camera-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .capture-btn {
+    background: #d4af37;
+    color: black;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+  }
+
+  .cancel-btn {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 25px;
+  }
 }
 </file>
 
 <file path="src/app/features/upload/upload.component.ts">
-import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject , ViewChild, ElementRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -2623,6 +3415,12 @@ uploadToBackend(file: File): void
 private convertFileToBase64(file: File): Promise<string>
 ⋮----
 browseFiles(): void
+⋮----
+async startCamera(): Promise<void>
+⋮----
+stopCamera(): void
+⋮----
+capturePhoto(): void
 </file>
 
 <file path="src/app/shared/components/header/header.component.html">
@@ -2630,6 +3428,7 @@ browseFiles(): void
   <div class="logo">
     <span class="logo-egy">Egy</span><span class="logo-guide">Guide</span>
   </div>
+
   <nav class="nav">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{ 'nav.home' | translate }}</a>
     <a routerLink="/chat" routerLinkActive="active">{{ 'nav.chat' | translate }}</a>
@@ -2637,22 +3436,43 @@ browseFiles(): void
     <a routerLink="/about" routerLinkActive="active">{{ 'nav.about' | translate }}</a>
   </nav>
 
+  <!-- Language Dropdown -->
   <div class="lang-switcher">
     <button
-      class="lang-btn"
-      [class.active]="currentLang() === 'en'"
-      (click)="switchLanguage('en')"
+      class="lang-selected"
+      (click)="toggleDropdown(); $event.stopPropagation()"
+      [attr.aria-expanded]="isDropdownOpen()"
     >
-      EN
+      <span class="lang-label">{{ 'lang.label' | translate }}</span>
+      <svg
+        class="lang-arrow"
+        [class.open]="isDropdownOpen()"
+        width="12" height="12" viewBox="0 0 12 12" fill="none"
+      >
+        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </button>
-    <span class="lang-divider">|</span>
-    <button
-      class="lang-btn"
-      [class.active]="currentLang() === 'ar'"
-      (click)="switchLanguage('ar')"
-    >
-      AR
-    </button>
+
+    @if (isDropdownOpen()) {
+      <div class="lang-dropdown" (click)="$event.stopPropagation()">
+        @for (lang of languages; track lang.code) {
+          <button
+            class="lang-option"
+            [class.active]="currentLang() === lang.code"
+            (click)="selectLanguage(lang.code)"
+          >
+            <span class="option-label">{{ lang.label }}</span>
+            @if (currentLang() === lang.code) {
+              <svg class="check-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7L5.5 10.5L12 3.5" stroke="#d4af37" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            }
+          </button>
+        }
+      </div>
+    }
   </div>
 </header>
 </file>
@@ -2671,13 +3491,8 @@ browseFiles(): void
     font-size: 2rem;
     font-weight: 300;
 
-    .logo-egy {
-      color: #fff;
-    }
-
-    .logo-guide {
-      color: #d4af37;
-    }
+    .logo-egy  { color: #fff; }
+    .logo-guide { color: #d4af37; }
   }
 
   .nav {
@@ -2691,56 +3506,152 @@ browseFiles(): void
       transition: color 0.3s;
 
       &:hover,
-      &.active {
-        color: #d4af37;
-      }
+      &.active { color: #d4af37; }
     }
   }
 
+  // ── Language Dropdown ──────────────────────────────────────────
   .lang-switcher {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    position: relative;
 
-    .lang-btn {
+    // Trigger: "Choose Language ▾"
+    .lang-selected {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      border-radius: 8px;
+      color: #d4af37;
+      padding: 0.4rem 0.85rem;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
       font-size: 1rem;
       font-weight: 600;
-      cursor: pointer;
-      padding: 0.3rem 0.5rem;
-      letter-spacing: 0.05em;
-      transition: color 0.3s;
-      font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      transition: background 0.25s, border-color 0.25s;
 
       &:hover {
-        color: rgba(212, 175, 55, 0.8);
+        background: rgba(212, 175, 55, 0.1);
+        border-color: #d4af37;
       }
 
-      &.active {
-        color: #d4af37;
+      .lang-label {
+        font-size: 0.95rem;
+      }
+
+      // Rotating chevron
+      .lang-arrow {
+        color: rgba(212, 175, 55, 0.75);
+        transition: transform 0.25s ease;
+        flex-shrink: 0;
+
+        &.open { transform: rotate(180deg); }
       }
     }
 
-    .lang-divider {
-      color: rgba(255, 255, 255, 0.2);
-      font-size: 1rem;
-      user-select: none;
+    // Dropdown panel
+    .lang-dropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      min-width: 170px;
+      background: #1c1c1c;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 1000;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(212, 175, 55, 0.06);
+      animation: dropdownIn 0.18s ease;
+
+      .lang-option {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.72);
+        padding: 0.7rem 1rem;
+        cursor: pointer;
+        font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
+        font-size: 1.05rem;
+        text-align: left;
+        transition: background 0.2s, color 0.2s;
+
+        &:last-child { border-bottom: none; }
+
+        .option-flag {
+          font-size: 1.25rem;  // Larger flag emoji
+          line-height: 1;
+          flex-shrink: 0;
+        }
+
+        .option-label { flex: 1; }
+
+        .check-icon {
+          flex-shrink: 0;
+          opacity: 0.9;
+        }
+
+        &:hover {
+          background: rgba(212, 175, 55, 0.1);
+          color: #d4af37;
+        }
+
+        &.active {
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.12);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem 1.5rem;
+
+    .nav {
+      gap: 1.5rem;
+      a { font-size: 1.1rem; }
     }
   }
 }
 </file>
 
 <file path="src/app/shared/components/header/header.component.ts">
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+  ElementRef,
+  HostListener
+} from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../core/services/language.service';
 ⋮----
 export class HeaderComponent {
 ⋮----
-switchLanguage(lang: string): void
+toggleDropdown(): void
+⋮----
+selectLanguage(code: string): void
+⋮----
+/** Close dropdown when clicking outside the header component */
+⋮----
+onDocumentClick(event: MouseEvent): void
 </file>
 
 <file path="src/assets/i18n/ar.json">
@@ -2752,9 +3663,11 @@ switchLanguage(lang: string): void
     "about": "عن المشروع"
   },
   "lang": {
-    "label": "اللغة",
     "en": "English",
-    "ar": "العربية"
+    "ar": "العربية",
+    "fr": "Français",
+    "zh": "中文",
+    "de": "Deutsch"
   },
   "home": {
     "line1": "اكتشف أسرار",
@@ -2764,9 +3677,13 @@ switchLanguage(lang: string): void
   },
   "upload": {
     "dragDrop": "اسحب وأفلت صورة الأثر هنا",
+    "takePhoto" : "التقط صورة",
     "or": "أو",
     "browse": "تصفح الملفات",
-    "fileInfo": "يدعم JPG وPNG. الحجم الأقصى 10MB."
+    "fileInfo": "يدعم JPG وPNG. الحجم الأقصى 10MB.",
+    "unknownTitle": "لم يتم التعرف على الأثر",
+    "unknownText": "هذه الصورة ليست ضمن الآثار المصرية التي تم تدريب النظام عليها. حاول رفع صورة أخرى.",
+    "tryAgain": "جرب صورة أخرى"
   },
   "analyzing": {
     "status": "جارٍ تحليل الأثر... يرجى الانتظار."
@@ -2781,8 +3698,8 @@ switchLanguage(lang: string): void
     "send": "إرسال",
     "sending": "جارٍ الإرسال...",
     "suggestedQ1": "أخبرني المزيد عن هذا الأثر",
-    "suggestedQ2": "إلى أي عصر ينتمي هذا الأثر؟",
-    "suggestedQ3": "ما الأهمية التاريخية لهذا الأثر؟"
+    "suggestedQ2": "إلى أي عصر ينتمي هذا؟",
+    "suggestedQ3": "ما هي أهميته التاريخية؟"
   },
   "chat": {
     "title": "تحدث مع",
@@ -2826,7 +3743,113 @@ switchLanguage(lang: string): void
     "feature3Desc": "الوصول إلى السياق التاريخي التفصيلي والجداول الزمنية والأهمية الثقافية لكل أثر ومعلم في قاعدة بياناتنا.",
     "techTitle": "التقنيات المستخدمة",
     "techDesc": "مبني بأحدث تقنيات وأطر الذكاء الاصطناعي",
+    "contactTitle": "تواصل معنا",
+    "email": "البريد الإلكتروني",
+    "universityName": "جامعة زويل للعلوم والتكنولوجيا",
+    "universityAddress": "طريق أحمد زويل، حدائق أكتوبر، مدينة السادس من أكتوبر، الجيزة، مصر",
+    "programName": "بكالوريوس علوم البيانات والذكاء الاصطناعي",
+    "programClass": "دفعة 2026",
+    "contactMessageTitle": "هل أنت مهتم بمشروعنا؟",
+    "contactMessageText": "نرحب بالملاحظات وفرص التعاون والأسئلة حول EgyGuide. سواء كنت معلماً أو مؤرخاً أو مهتماً بالتكنولوجيا، يسعدنا التواصل معك.",
+    "contactClosing": "هذا المشروع جزء من التزامنا المستمر باستخدام الذكاء الاصطناعي للحفاظ على التراث الثقافي والتعليم.",
     "footerTagline": "نجسر بين العصور القديمة والحديثة من خلال الذكاء الاصطناعي"
+  }
+}
+</file>
+
+<file path="src/assets/i18n/de.json">
+{
+  "nav": {
+    "home": "Startseite",
+    "chat": "Chat",
+    "history": "Mein Verlauf",
+    "about": "Über Uns"
+  },
+  "lang": {
+    "label": "Sprache",
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français",
+    "zh": "中文",
+    "de": "Deutsch"
+  },
+  "home": {
+    "line1": "Enthülle die Geheimnisse des",
+    "line2": "Alten Ägyptens",
+    "subtitle": "Dein KI-gesteuerter Reiseführer zu den größten Monumenten der Geschichte.",
+    "cta": "Erkundung Starten"
+  },
+  "upload": {
+    "dragDrop": "Ziehe dein Artefaktbild hierher",
+    "or": "oder",
+    "browse": "Dateien Durchsuchen",
+    "fileInfo": "Unterstützt JPG, PNG. Maximale Größe 10 MB.",
+    "takePhoto": "Foto aufnehmen",
+    "capture": "Aufnehmen",
+    "cancel": "Abbrechen",
+    "unknownTitle": "Artefakt nicht erkannt",
+    "unknownText": "Dieses Bild ist nicht Teil unserer trainierten ägyptischen Artefakte. Bitte versuche ein anderes Bild.",
+    "tryAgain": "Anderes Bild versuchen"
+  },
+  "analyzing": {
+    "status": "Artefakt wird analysiert... Bitte warten."
+  },
+  "detail": {
+    "quickFacts": "Kurzfakten",
+    "dynasty": "Dynastie",
+    "location": "Standort",
+    "description": "Beschreibung",
+    "chatWith": "Chatte mit",
+    "placeholder": "Frag irgendetwas...",
+    "send": "Senden",
+    "sending": "Wird gesendet...",
+    "suggestedQ1": "Erzähl mir mehr über dieses Artefakt",
+    "suggestedQ2": "Zu welcher Epoche gehört es?",
+    "suggestedQ3": "Was ist seine historische Bedeutung?"
+  },
+  "chat": {
+    "title": "Chatte mit",
+    "highlight": "EgyGuide KI",
+    "subtitle": "Dein persönlicher Führer durch die Geschichte des alten Ägyptens",
+    "placeholder": "Frag alles über das alte Ägypten...",
+    "send": "Senden",
+    "sending": "Wird gesendet...",
+    "suggestedQ1": "Erzähl mir von den Pyramiden von Gizeh",
+    "suggestedQ2": "Wer war Kleopatra?",
+    "suggestedQ3": "Was sind ägyptische Hieroglyphen?",
+    "suggestedQ4": "Erzähl mir vom Tal der Könige"
+  },
+  "history": {
+    "title": "Mein Erkundungsverlauf",
+    "searchPlaceholder": "Artefakte, Orte, Pharaonen suchen...",
+    "sortByDate": "Sortieren nach: Datum",
+    "sortByName": "Sortieren nach: Name",
+    "noResults": "Keine Artefakte gefunden",
+    "adjustSearch": "Versuche, deine Suchbegriffe anzupassen"
+  },
+  "about": {
+    "title": "Über",
+    "highlight": "EgyGuide",
+    "subtitle": "Das alte Ägypten durch KI-Technologie zum Leben erwecken",
+    "missionTitle": "Unsere Mission",
+    "missionText": "EgyGuide ist eine innovative KI-gestützte Plattform, die darauf ausgelegt ist, die Geschichte des alten Ägyptens für alle zugänglich und spannend zu machen. Durch die Kombination modernster Computer-Vision und natürlicher Sprachverarbeitung verändern wir, wie Menschen Ägyptens prächtige Artefakte und reiche Kulturerbe entdecken.",
+    "academicTitle": "Akademisches Projekt",
+    "university": "Zewail City Universität für Wissenschaft und Technologie",
+    "program": "Studienprogramm Datenwissenschaft & Künstliche Intelligenz",
+    "projectType": "Abschlussprojekt 2026",
+    "projectDesc": "Dieses Projekt stellt den Höhepunkt unseres Studiums in KI und maschinellem Lernen dar, das theoretisches Wissen mit praktischer Anwendung kombiniert, um reale Herausforderungen bei der Bewahrung des kulturellen Erbes zu lösen.",
+    "teamTitle": "Unser Team",
+    "teamIntro": "Eine leidenschaftliche Gruppe von Studierenden, die Technologie und Geschichte verbinden",
+    "featuresTitle": "Hauptfunktionen",
+    "feature1Title": "KI-Erkennung",
+    "feature1Desc": "Ägyptische Artefakte sofort identifizieren mit fortschrittlicher Computer-Vision und Deep-Learning-Modellen, die mit Tausenden historischer Objekte trainiert wurden.",
+    "feature2Title": "Interaktiver Chat",
+    "feature2Desc": "Führe natürliche Gespräche mit unserem KI-Führer, der von großen Sprachmodellen angetrieben wird, die auf ägyptische Geschichte und Kultur feinabgestimmt sind.",
+    "feature3Title": "Reiche Geschichte",
+    "feature3Desc": "Zugriff auf detaillierten historischen Kontext, Zeitlinien und kulturelle Bedeutung für jedes Artefakt und Monument in unserer Datenbank.",
+    "techTitle": "Technologie-Stack",
+    "techDesc": "Erstellt mit modernen KI-Technologien und Frameworks",
+    "footerTagline": "Das Alte und das Moderne durch KI verbinden"
   }
 }
 </file>
@@ -2842,7 +3865,10 @@ switchLanguage(lang: string): void
   "lang": {
     "label": "Language",
     "en": "English",
-    "ar": "Arabic"
+    "ar": "العربية",
+    "fr": "Français",
+    "zh": "中文",
+    "de": "Deutsch"
   },
   "home": {
     "line1": "Unveil the Secrets of",
@@ -2852,9 +3878,13 @@ switchLanguage(lang: string): void
   },
   "upload": {
     "dragDrop": "Drag & Drop your artifact image here",
+    "takePhoto": "Take Photo",
     "or": "or",
     "browse": "Browse Files",
-    "fileInfo": "Supports JPG, PNG. Max size 10MB."
+    "fileInfo": "Supports JPG, PNG. Max size 10MB.",
+    "unknownTitle": "Artifact Not Recognized",
+    "unknownText": "This image is not part of our trained Egyptian artifacts. Please try another image.",
+    "tryAgain": "Try Another Image"
   },
   "analyzing": {
     "status": "Analyzing Artifact... Please wait."
@@ -2869,8 +3899,8 @@ switchLanguage(lang: string): void
     "send": "Send",
     "sending": "Sending...",
     "suggestedQ1": "Tell me more about this artifact",
-    "suggestedQ2": "What era does this belong to?",
-    "suggestedQ3": "What is the historical significance?"
+    "suggestedQ2": "What is its dynasty?",
+    "suggestedQ3": "Where is it located?"
   },
   "chat": {
     "title": "Chat with",
@@ -2881,8 +3911,7 @@ switchLanguage(lang: string): void
     "sending": "Sending...",
     "suggestedQ1": "Tell me about the pyramids of Giza",
     "suggestedQ2": "Who was Cleopatra?",
-    "suggestedQ3": "What were Egyptian hieroglyphics?",
-    "suggestedQ4": "Tell me about the Valley of the Kings"
+    "suggestedQ3": "Who is Ramessess II"
   },
   "history": {
     "title": "My Exploration History",
@@ -2914,7 +3943,210 @@ switchLanguage(lang: string): void
     "feature3Desc": "Access detailed historical context, timelines, and cultural significance for every artifact and monument in our database.",
     "techTitle": "Technology Stack",
     "techDesc": "Built with modern AI technologies and frameworks",
+    "contactTitle": "Get In Touch",
+    "email": "Email",
+    "universityName": "Zewail City of Science and Technology",
+    "universityAddress": "Ahmed Zewail Road, October Gardens, 6th of October City, Giza, Egypt",
+    "programName": "B.Sc. Data Science & Artificial Intelligence",
+    "programClass": "Class of 2026",
+    "contactMessageTitle": "Interested in our project?",
+    "contactMessageText": "We welcome feedback, collaboration opportunities, and questions about EgyGuide. Whether you're an educator, historian, or technology enthusiast, we'd love to hear from you.",
+    "contactClosing": "This project is part of our ongoing commitment to using artificial intelligence for cultural preservation and education.",
     "footerTagline": "Bridging the ancient and the modern through AI"
+  }
+}
+</file>
+
+<file path="src/assets/i18n/fr.json">
+{
+  "nav": {
+    "home": "Accueil",
+    "chat": "Discussion",
+    "history": "Mon Historique",
+    "about": "À Propos"
+  },
+  "lang": {
+    "label": "Langue",
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français",
+    "zh": "中文",
+    "de": "Deutsch"
+  },
+  "home": {
+    "line1": "Dévoilez les Secrets de",
+    "line2": "l'Égypte Ancienne",
+    "subtitle": "Votre guide IA pour les plus grands monuments de l'histoire.",
+    "cta": "Commencer l'Exploration"
+  },
+  "upload": {
+    "dragDrop": "Glissez-déposez votre image d'artefact ici",
+    "or": "ou",
+    "browse": "Parcourir les Fichiers",
+    "fileInfo": "Supporte JPG, PNG. Taille max 10 Mo.",
+    "takePhoto": "Prendre une Photo",
+    "capture": "Capturer",
+    "cancel": "Annuler",
+    "unknownTitle": "Artefact Non Reconnu",
+    "unknownText": "Cette image ne fait pas partie de nos artefacts égyptiens entraînés. Veuillez essayer une autre image.",
+    "tryAgain": "Essayer une autre image"
+  },
+  "analyzing": {
+    "status": "Analyse de l'Artefact... Veuillez patienter."
+  },
+  "detail": {
+    "quickFacts": "Faits Rapides",
+    "dynasty": "Dynastie",
+    "location": "Emplacement",
+    "description": "Description",
+    "chatWith": "Discutez avec",
+    "placeholder": "Posez n'importe quelle question...",
+    "send": "Envoyer",
+    "sending": "Envoi en cours...",
+    "suggestedQ1": "Parlez-moi davantage de cet artefact",
+    "suggestedQ2": "À quelle époque appartient-il?",
+    "suggestedQ3": "Quelle est son importance historique?"
+  },
+  "chat": {
+    "title": "Discutez avec",
+    "highlight": "EgyGuide IA",
+    "subtitle": "Votre guide personnel de l'histoire de l'Égypte ancienne",
+    "placeholder": "Posez des questions sur l'Égypte ancienne...",
+    "send": "Envoyer",
+    "sending": "Envoi en cours...",
+    "suggestedQ1": "Parlez-moi des pyramides de Gizeh",
+    "suggestedQ2": "Qui était Cléopâtre?",
+    "suggestedQ3": "Que sont les hiéroglyphes égyptiens?",
+    "suggestedQ4": "Parlez-moi de la Vallée des Rois"
+  },
+  "history": {
+    "title": "Mon Historique d'Exploration",
+    "searchPlaceholder": "Rechercher des artefacts, lieux, pharaons...",
+    "sortByDate": "Trier par: Date",
+    "sortByName": "Trier par: Nom",
+    "noResults": "Aucun artefact trouvé",
+    "adjustSearch": "Essayez de modifier vos termes de recherche"
+  },
+  "about": {
+    "title": "À Propos d'",
+    "highlight": "EgyGuide",
+    "subtitle": "Faire revivre l'Égypte ancienne grâce à la technologie IA",
+    "missionTitle": "Notre Mission",
+    "missionText": "EgyGuide est une plateforme innovante propulsée par l'IA, conçue pour rendre l'histoire de l'Égypte ancienne accessible à tous. En combinant la vision par ordinateur de pointe et le traitement du langage naturel, nous transformons la façon dont les gens explorent les magnifiques artefacts égyptiens.",
+    "academicTitle": "Projet Académique",
+    "university": "Université des Sciences et Technologies de Zewail",
+    "program": "Programme Science des Données et Intelligence Artificielle",
+    "projectType": "Projet de Graduation 2026",
+    "projectDesc": "Ce projet représente l'aboutissement de nos études en IA et apprentissage automatique, combinant connaissances théoriques et application pratique pour résoudre des défis réels dans la préservation du patrimoine culturel.",
+    "teamTitle": "Rencontrez Notre Équipe",
+    "teamIntro": "Un groupe passionné d'étudiants dédiés à relier technologie et histoire",
+    "featuresTitle": "Fonctionnalités Clés",
+    "feature1Title": "Reconnaissance IA",
+    "feature1Desc": "Identifiez instantanément les artefacts égyptiens grâce à la vision par ordinateur avancée et des modèles d'apprentissage profond entraînés sur des milliers d'objets historiques.",
+    "feature2Title": "Chat Interactif",
+    "feature2Desc": "Engagez des conversations naturelles avec notre guide IA alimenté par de grands modèles de langage affinés sur l'histoire et la culture égyptiennes.",
+    "feature3Title": "Riche Histoire",
+    "feature3Desc": "Accédez au contexte historique détaillé, aux chronologies et à la signification culturelle de chaque artefact et monument dans notre base de données.",
+    "techTitle": "Technologies Utilisées",
+    "techDesc": "Construit avec des technologies et frameworks IA modernes",
+    "footerTagline": "Relier l'ancien et le moderne grâce à l'IA"
+  }
+}
+</file>
+
+<file path="src/assets/i18n/zh.json">
+{
+  "nav": {
+    "home": "首页",
+    "chat": "聊天",
+    "history": "我的历史",
+    "about": "关于我们"
+  },
+  "lang": {
+    "label": "语言",
+    "en": "English",
+    "ar": "العربية",
+    "fr": "Français",
+    "zh": "中文",
+    "de": "Deutsch"
+  },
+  "home": {
+    "line1": "揭开古老的秘密",
+    "line2": "埃及文明",
+    "subtitle": "您的AI导游，带您探索历史上最伟大的纪念碑。",
+    "cta": "开始探索"
+  },
+  "upload": {
+    "dragDrop": "将文物图片拖放到此处",
+    "or": "或",
+    "browse": "浏览文件",
+    "fileInfo": "支持 JPG、PNG 格式，最大 10MB。",
+    "takePhoto": "拍照",
+    "capture": "拍摄",
+    "cancel": "取消",
+    "unknownTitle": "无法识别文物",
+    "unknownText": "此图像不在我们训练的埃及文物范围内。请尝试另一张图片。",
+    "tryAgain": "尝试另一张图片"
+  },
+  "analyzing": {
+    "status": "正在分析文物...请稍候。"
+  },
+  "detail": {
+    "quickFacts": "快速事实",
+    "dynasty": "朝代",
+    "location": "地点",
+    "description": "描述",
+    "chatWith": "与以下对话",
+    "placeholder": "随便问...",
+    "send": "发送",
+    "sending": "发送中...",
+    "suggestedQ1": "告诉我更多关于这件文物的信息",
+    "suggestedQ2": "这件文物属于哪个时代？",
+    "suggestedQ3": "它有什么历史意义？"
+  },
+  "chat": {
+    "title": "与以下对话",
+    "highlight": "EgyGuide 人工智能",
+    "subtitle": "您的古埃及历史个人向导",
+    "placeholder": "询问任何关于古埃及的问题...",
+    "send": "发送",
+    "sending": "发送中...",
+    "suggestedQ1": "告诉我吉萨金字塔的信息",
+    "suggestedQ2": "克利奥帕特拉是谁？",
+    "suggestedQ3": "什么是埃及象形文字？",
+    "suggestedQ4": "告诉我帝王谷的信息"
+  },
+  "history": {
+    "title": "我的探索历史",
+    "searchPlaceholder": "搜索文物、地点、法老...",
+    "sortByDate": "排序方式：日期",
+    "sortByName": "排序方式：名称",
+    "noResults": "未找到文物",
+    "adjustSearch": "请尝试调整搜索条件"
+  },
+  "about": {
+    "title": "关于",
+    "highlight": "EgyGuide",
+    "subtitle": "通过人工智能技术让古埃及重焕生机",
+    "missionTitle": "我们的使命",
+    "missionText": "EgyGuide 是一个创新的人工智能平台，旨在让所有人都能了解古埃及历史。通过结合前沿的计算机视觉和自然语言处理技术，我们改变了人们探索埃及壮丽文物和丰富文化遗产的方式。",
+    "academicTitle": "学术项目",
+    "university": "泽维尔科技大学",
+    "program": "数据科学与人工智能专业",
+    "projectType": "2026届毕业项目",
+    "projectDesc": "该项目是我们在人工智能和机器学习领域学习的结晶，将理论知识与实际应用相结合，解决文化遗产保护和教育领域的现实挑战。",
+    "teamTitle": "认识我们的团队",
+    "teamIntro": "一群致力于将技术与历史联系起来的热情学生",
+    "featuresTitle": "主要功能",
+    "feature1Title": "人工智能识别",
+    "feature1Desc": "使用先进的计算机视觉和深度学习模型即时识别埃及文物，这些模型经过数千件历史文物的训练。",
+    "feature2Title": "互动聊天",
+    "feature2Desc": "与我们的人工智能导游进行自然对话，该导游由针对埃及历史和文化微调的大型语言模型提供支持。",
+    "feature3Title": "丰富的历史",
+    "feature3Desc": "访问我们数据库中每件文物和纪念碑的详细历史背景、时间线和文化意义。",
+    "techTitle": "技术栈",
+    "techDesc": "使用现代人工智能技术和框架构建",
+    "footerTagline": "通过人工智能连接古代与现代"
   }
 }
 </file>
@@ -2925,687 +4157,6 @@ switchLanguage(lang: string): void
 
 <file path="src/environments/environment.ts">
 apiUrl: 'https://contractedly-unblemishable-anitra.ngrok-free.dev'  // Update this for production later
-</file>
-
-<file path=".editorconfig">
-# Editor configuration, see https://editorconfig.org
-root = true
-
-[*]
-charset = utf-8
-indent_style = space
-indent_size = 2
-insert_final_newline = true
-trim_trailing_whitespace = true
-
-[*.ts]
-quote_type = single
-ij_typescript_use_double_quotes = false
-
-[*.md]
-max_line_length = off
-trim_trailing_whitespace = false
-</file>
-
-<file path=".gitignore">
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
-
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
-
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
-
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-
-# System files
-.DS_Store
-Thumbs.db
-</file>
-
-<file path="angular.json">
-{
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1,
-  "newProjectRoot": "projects",
-  "projects": {
-    "egyguide": {
-      "projectType": "application",
-      "schematics": {
-        "@schematics/angular:component": {
-          "style": "scss"
-        }
-      },
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:application",
-          "options": {
-            "outputPath": "dist/egyguide",
-            "index": "src/index.html",
-            "browser": "src/main.ts",
-            "polyfills": [
-              "zone.js"
-            ],
-            "tsConfig": "tsconfig.app.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              },
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
-          },
-          "configurations": {
-            "production": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "egyguide:build:production"
-            },
-            "development": {
-              "buildTarget": "egyguide:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              },
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
-            "scripts": []
-          }
-        }
-      }
-    }
-  }
-}
-</file>
-
-<file path="package.json">
-{
-  "name": "egyguide",
-  "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:egyguide": "node dist/egyguide/server/server.mjs"
-  },
-  "private": true,
-  "dependencies": {
-    "@angular/common": "^19.2.0",
-    "@angular/compiler": "^19.2.0",
-    "@angular/core": "^19.2.0",
-    "@angular/forms": "^19.2.0",
-    "@angular/platform-browser": "^19.2.0",
-    "@angular/platform-browser-dynamic": "^19.2.0",
-    "@angular/platform-server": "^19.2.0",
-    "@angular/router": "^19.2.0",
-    "@angular/ssr": "^19.2.20",
-    "@ngx-translate/core": "^17.0.0",
-    "@ngx-translate/http-loader": "^17.0.0",
-    "express": "^4.18.2",
-    "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.20",
-    "@angular/cli": "^19.2.20",
-    "@angular/compiler-cli": "^19.2.0",
-    "@types/express": "^4.17.17",
-    "@types/jasmine": "~5.1.0",
-    "@types/node": "^18.18.0",
-    "jasmine-core": "~5.6.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
-  }
-}
-</file>
-
-<file path="README.md">
-# Egyguide
-
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.20.
-
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
-</file>
-
-<file path="src/app/app.component.html">
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
-<style>
-  :host {
-    --bright-blue: oklch(51.01% 0.274 263.83);
-    --electric-violet: oklch(53.18% 0.28 296.97);
-    --french-violet: oklch(47.66% 0.246 305.88);
-    --vivid-pink: oklch(69.02% 0.277 332.77);
-    --hot-red: oklch(61.42% 0.238 15.34);
-    --orange-red: oklch(63.32% 0.24 31.68);
-
-    --gray-900: oklch(19.37% 0.006 300.98);
-    --gray-700: oklch(36.98% 0.014 302.71);
-    --gray-400: oklch(70.9% 0.015 304.04);
-
-    --red-to-pink-to-purple-vertical-gradient: linear-gradient(
-      180deg,
-      var(--orange-red) 0%,
-      var(--vivid-pink) 50%,
-      var(--electric-violet) 100%
-    );
-
-    --red-to-pink-to-purple-horizontal-gradient: linear-gradient(
-      90deg,
-      var(--orange-red) 0%,
-      var(--vivid-pink) 50%,
-      var(--electric-violet) 100%
-    );
-
-    --pill-accent: var(--bright-blue);
-
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1 {
-    font-size: 3.125rem;
-    color: var(--gray-900);
-    font-weight: 500;
-    line-height: 100%;
-    letter-spacing: -0.125rem;
-    margin: 0;
-    font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
-  }
-
-  p {
-    margin: 0;
-    color: var(--gray-700);
-  }
-
-  main {
-    width: 100%;
-    min-height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    box-sizing: inherit;
-    position: relative;
-  }
-
-  .angular-logo {
-    max-width: 9.2rem;
-  }
-
-  .content {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    max-width: 700px;
-    margin-bottom: 3rem;
-  }
-
-  .content h1 {
-    margin-top: 1.75rem;
-  }
-
-  .content p {
-    margin-top: 1.5rem;
-  }
-
-  .divider {
-    width: 1px;
-    background: var(--red-to-pink-to-purple-vertical-gradient);
-    margin-inline: 0.5rem;
-  }
-
-  .pill-group {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-  }
-
-  .pill {
-    display: flex;
-    align-items: center;
-    --pill-accent: var(--bright-blue);
-    background: color-mix(in srgb, var(--pill-accent) 5%, transparent);
-    color: var(--pill-accent);
-    padding-inline: 0.75rem;
-    padding-block: 0.375rem;
-    border-radius: 2.75rem;
-    border: 0;
-    transition: background 0.3s ease;
-    font-family: var(--inter-font);
-    font-size: 0.875rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 1.4rem;
-    letter-spacing: -0.00875rem;
-    text-decoration: none;
-  }
-
-  .pill:hover {
-    background: color-mix(in srgb, var(--pill-accent) 15%, transparent);
-  }
-
-  .pill-group .pill:nth-child(6n + 1) {
-    --pill-accent: var(--bright-blue);
-  }
-  .pill-group .pill:nth-child(6n + 2) {
-    --pill-accent: var(--french-violet);
-  }
-  .pill-group .pill:nth-child(6n + 3),
-  .pill-group .pill:nth-child(6n + 4),
-  .pill-group .pill:nth-child(6n + 5) {
-    --pill-accent: var(--hot-red);
-  }
-
-  .pill-group svg {
-    margin-inline-start: 0.25rem;
-  }
-
-  .social-links {
-    display: flex;
-    align-items: center;
-    gap: 0.73rem;
-    margin-top: 1.5rem;
-  }
-
-  .social-links path {
-    transition: fill 0.3s ease;
-    fill: var(--gray-400);
-  }
-
-  .social-links a:hover svg path {
-    fill: var(--gray-900);
-  }
-
-  @media screen and (max-width: 650px) {
-    .content {
-      flex-direction: column;
-      width: max-content;
-    }
-
-    .divider {
-      height: 1px;
-      width: 100%;
-      background: var(--red-to-pink-to-purple-horizontal-gradient);
-      margin-block: 1.5rem;
-    }
-  }
-</style>
-
-<main class="main">
-  <div class="content">
-    <div class="left-side">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 982 239"
-        fill="none"
-        class="angular-logo"
-      >
-        <g clip-path="url(#a)">
-          <path
-            fill="url(#b)"
-            d="M388.676 191.625h30.849L363.31 31.828h-35.758l-56.215 159.797h30.848l13.174-39.356h60.061l13.256 39.356Zm-65.461-62.675 21.602-64.311h1.227l21.602 64.311h-44.431Zm126.831-7.527v70.202h-28.23V71.839h27.002v20.374h1.392c2.782-6.71 7.2-12.028 13.255-15.956 6.056-3.927 13.584-5.89 22.503-5.89 8.264 0 15.465 1.8 21.684 5.318 6.137 3.518 10.964 8.673 14.319 15.382 3.437 6.71 5.074 14.81 4.992 24.383v76.175h-28.23v-71.92c0-8.019-2.046-14.237-6.219-18.819-4.173-4.5-9.819-6.791-17.102-6.791-4.91 0-9.328 1.063-13.174 3.272-3.846 2.128-6.792 5.237-9.001 9.328-2.046 4.009-3.191 8.918-3.191 14.728ZM589.233 239c-10.147 0-18.82-1.391-26.103-4.091-7.282-2.7-13.092-6.382-17.511-10.964-4.418-4.582-7.528-9.655-9.164-15.219l25.448-6.136c1.145 2.372 2.782 4.663 4.991 6.954 2.209 2.291 5.155 4.255 8.837 5.81 3.683 1.554 8.428 2.291 14.074 2.291 8.019 0 14.647-1.964 19.884-5.81 5.237-3.845 7.856-10.227 7.856-19.064v-22.665h-1.391c-1.473 2.946-3.601 5.892-6.383 9.001-2.782 3.109-6.464 5.645-10.965 7.691-4.582 2.046-10.228 3.109-17.101 3.109-9.165 0-17.511-2.209-25.039-6.545-7.446-4.337-13.42-10.883-17.757-19.474-4.418-8.673-6.628-19.473-6.628-32.565 0-13.091 2.21-24.301 6.628-33.383 4.419-9.082 10.311-15.955 17.839-20.7 7.528-4.746 15.874-7.037 25.039-7.037 7.037 0 12.846 1.145 17.347 3.518 4.582 2.373 8.182 5.236 10.883 8.51 2.7 3.272 4.746 6.382 6.137 9.327h1.554v-19.8h27.821v121.749c0 10.228-2.454 18.737-7.364 25.447-4.91 6.709-11.538 11.7-20.048 15.055-8.509 3.355-18.165 4.991-28.884 4.991Zm.245-71.266c5.974 0 11.047-1.473 15.302-4.337 4.173-2.945 7.446-7.118 9.573-12.519 2.21-5.482 3.274-12.027 3.274-19.637 0-7.609-1.064-14.155-3.274-19.8-2.127-5.646-5.318-10.064-9.491-13.255-4.174-3.11-9.329-4.746-15.384-4.746s-11.537 1.636-15.792 4.91c-4.173 3.272-7.365 7.772-9.492 13.418-2.128 5.727-3.191 12.191-3.191 19.392 0 7.2 1.063 13.745 3.273 19.228 2.127 5.482 5.318 9.736 9.573 12.764 4.174 3.027 9.41 4.582 15.629 4.582Zm141.56-26.51V71.839h28.23v119.786h-27.412v-21.273h-1.227c-2.7 6.709-7.119 12.191-13.338 16.446-6.137 4.255-13.747 6.382-22.748 6.382-7.855 0-14.81-1.718-20.783-5.237-5.974-3.518-10.72-8.591-14.075-15.382-3.355-6.709-5.073-14.891-5.073-24.464V71.839h28.312v71.921c0 7.609 2.046 13.664 6.219 18.083 4.173 4.5 9.655 6.709 16.365 6.709 4.173 0 8.183-.982 12.111-3.028 3.927-2.045 7.118-5.072 9.655-9.082 2.537-4.091 3.764-9.164 3.764-15.218Zm65.707-109.395v159.796h-28.23V31.828h28.23Zm44.841 162.169c-7.61 0-14.402-1.391-20.457-4.091-6.055-2.7-10.883-6.791-14.32-12.109-3.518-5.319-5.237-11.946-5.237-19.801 0-6.791 1.228-12.355 3.765-16.773 2.536-4.419 5.891-7.937 10.228-10.637 4.337-2.618 9.164-4.664 14.647-6.055 5.4-1.391 11.046-2.373 16.856-3.027 7.037-.737 12.683-1.391 17.102-1.964 4.337-.573 7.528-1.555 9.574-2.782 1.963-1.309 3.027-3.273 3.027-5.973v-.491c0-5.891-1.718-10.391-5.237-13.664-3.518-3.191-8.51-4.828-15.056-4.828-6.955 0-12.356 1.473-16.447 4.5-4.009 3.028-6.71 6.546-8.183 10.719l-26.348-3.764c2.046-7.282 5.483-13.336 10.31-18.328 4.746-4.909 10.638-8.59 17.511-11.045 6.955-2.455 14.565-3.682 22.912-3.682 5.809 0 11.537.654 17.265 2.045s10.965 3.6 15.711 6.71c4.746 3.109 8.51 7.282 11.455 12.6 2.864 5.318 4.337 11.946 4.337 19.883v80.184h-27.166v-16.446h-.9c-1.719 3.355-4.092 6.464-7.201 9.328-3.109 2.864-6.955 5.237-11.619 6.955-4.828 1.718-10.229 2.536-16.529 2.536Zm7.364-20.701c5.646 0 10.556-1.145 14.729-3.354 4.173-2.291 7.364-5.237 9.655-9.001 2.292-3.763 3.355-7.854 3.355-12.273v-14.155c-.9.737-2.373 1.391-4.5 2.046-2.128.654-4.419 1.145-7.037 1.636-2.619.491-5.155.9-7.692 1.227-2.537.328-4.746.655-6.628.901-4.173.572-8.019 1.472-11.292 2.781-3.355 1.31-5.973 3.11-7.855 5.401-1.964 2.291-2.864 5.318-2.864 8.918 0 5.237 1.882 9.164 5.728 11.782 3.682 2.782 8.51 4.091 14.401 4.091Zm64.643 18.328V71.839h27.412v19.965h1.227c2.21-6.955 5.974-12.274 11.292-16.038 5.319-3.763 11.456-5.645 18.329-5.645 1.555 0 3.355.082 5.237.163 1.964.164 3.601.328 4.91.573v25.938c-1.227-.41-3.109-.819-5.646-1.146a58.814 58.814 0 0 0-7.446-.49c-5.155 0-9.738 1.145-13.829 3.354-4.091 2.209-7.282 5.236-9.655 9.164-2.373 3.927-3.519 8.427-3.519 13.5v70.448h-28.312ZM222.077 39.192l-8.019 125.923L137.387 0l84.69 39.192Zm-53.105 162.825-57.933 33.056-57.934-33.056 11.783-28.556h92.301l11.783 28.556ZM111.039 62.675l30.357 73.803H80.681l30.358-73.803ZM7.937 165.115 0 39.192 84.69 0 7.937 165.115Z"
-          />
-          <path
-            fill="url(#c)"
-            d="M388.676 191.625h30.849L363.31 31.828h-35.758l-56.215 159.797h30.848l13.174-39.356h60.061l13.256 39.356Zm-65.461-62.675 21.602-64.311h1.227l21.602 64.311h-44.431Zm126.831-7.527v70.202h-28.23V71.839h27.002v20.374h1.392c2.782-6.71 7.2-12.028 13.255-15.956 6.056-3.927 13.584-5.89 22.503-5.89 8.264 0 15.465 1.8 21.684 5.318 6.137 3.518 10.964 8.673 14.319 15.382 3.437 6.71 5.074 14.81 4.992 24.383v76.175h-28.23v-71.92c0-8.019-2.046-14.237-6.219-18.819-4.173-4.5-9.819-6.791-17.102-6.791-4.91 0-9.328 1.063-13.174 3.272-3.846 2.128-6.792 5.237-9.001 9.328-2.046 4.009-3.191 8.918-3.191 14.728ZM589.233 239c-10.147 0-18.82-1.391-26.103-4.091-7.282-2.7-13.092-6.382-17.511-10.964-4.418-4.582-7.528-9.655-9.164-15.219l25.448-6.136c1.145 2.372 2.782 4.663 4.991 6.954 2.209 2.291 5.155 4.255 8.837 5.81 3.683 1.554 8.428 2.291 14.074 2.291 8.019 0 14.647-1.964 19.884-5.81 5.237-3.845 7.856-10.227 7.856-19.064v-22.665h-1.391c-1.473 2.946-3.601 5.892-6.383 9.001-2.782 3.109-6.464 5.645-10.965 7.691-4.582 2.046-10.228 3.109-17.101 3.109-9.165 0-17.511-2.209-25.039-6.545-7.446-4.337-13.42-10.883-17.757-19.474-4.418-8.673-6.628-19.473-6.628-32.565 0-13.091 2.21-24.301 6.628-33.383 4.419-9.082 10.311-15.955 17.839-20.7 7.528-4.746 15.874-7.037 25.039-7.037 7.037 0 12.846 1.145 17.347 3.518 4.582 2.373 8.182 5.236 10.883 8.51 2.7 3.272 4.746 6.382 6.137 9.327h1.554v-19.8h27.821v121.749c0 10.228-2.454 18.737-7.364 25.447-4.91 6.709-11.538 11.7-20.048 15.055-8.509 3.355-18.165 4.991-28.884 4.991Zm.245-71.266c5.974 0 11.047-1.473 15.302-4.337 4.173-2.945 7.446-7.118 9.573-12.519 2.21-5.482 3.274-12.027 3.274-19.637 0-7.609-1.064-14.155-3.274-19.8-2.127-5.646-5.318-10.064-9.491-13.255-4.174-3.11-9.329-4.746-15.384-4.746s-11.537 1.636-15.792 4.91c-4.173 3.272-7.365 7.772-9.492 13.418-2.128 5.727-3.191 12.191-3.191 19.392 0 7.2 1.063 13.745 3.273 19.228 2.127 5.482 5.318 9.736 9.573 12.764 4.174 3.027 9.41 4.582 15.629 4.582Zm141.56-26.51V71.839h28.23v119.786h-27.412v-21.273h-1.227c-2.7 6.709-7.119 12.191-13.338 16.446-6.137 4.255-13.747 6.382-22.748 6.382-7.855 0-14.81-1.718-20.783-5.237-5.974-3.518-10.72-8.591-14.075-15.382-3.355-6.709-5.073-14.891-5.073-24.464V71.839h28.312v71.921c0 7.609 2.046 13.664 6.219 18.083 4.173 4.5 9.655 6.709 16.365 6.709 4.173 0 8.183-.982 12.111-3.028 3.927-2.045 7.118-5.072 9.655-9.082 2.537-4.091 3.764-9.164 3.764-15.218Zm65.707-109.395v159.796h-28.23V31.828h28.23Zm44.841 162.169c-7.61 0-14.402-1.391-20.457-4.091-6.055-2.7-10.883-6.791-14.32-12.109-3.518-5.319-5.237-11.946-5.237-19.801 0-6.791 1.228-12.355 3.765-16.773 2.536-4.419 5.891-7.937 10.228-10.637 4.337-2.618 9.164-4.664 14.647-6.055 5.4-1.391 11.046-2.373 16.856-3.027 7.037-.737 12.683-1.391 17.102-1.964 4.337-.573 7.528-1.555 9.574-2.782 1.963-1.309 3.027-3.273 3.027-5.973v-.491c0-5.891-1.718-10.391-5.237-13.664-3.518-3.191-8.51-4.828-15.056-4.828-6.955 0-12.356 1.473-16.447 4.5-4.009 3.028-6.71 6.546-8.183 10.719l-26.348-3.764c2.046-7.282 5.483-13.336 10.31-18.328 4.746-4.909 10.638-8.59 17.511-11.045 6.955-2.455 14.565-3.682 22.912-3.682 5.809 0 11.537.654 17.265 2.045s10.965 3.6 15.711 6.71c4.746 3.109 8.51 7.282 11.455 12.6 2.864 5.318 4.337 11.946 4.337 19.883v80.184h-27.166v-16.446h-.9c-1.719 3.355-4.092 6.464-7.201 9.328-3.109 2.864-6.955 5.237-11.619 6.955-4.828 1.718-10.229 2.536-16.529 2.536Zm7.364-20.701c5.646 0 10.556-1.145 14.729-3.354 4.173-2.291 7.364-5.237 9.655-9.001 2.292-3.763 3.355-7.854 3.355-12.273v-14.155c-.9.737-2.373 1.391-4.5 2.046-2.128.654-4.419 1.145-7.037 1.636-2.619.491-5.155.9-7.692 1.227-2.537.328-4.746.655-6.628.901-4.173.572-8.019 1.472-11.292 2.781-3.355 1.31-5.973 3.11-7.855 5.401-1.964 2.291-2.864 5.318-2.864 8.918 0 5.237 1.882 9.164 5.728 11.782 3.682 2.782 8.51 4.091 14.401 4.091Zm64.643 18.328V71.839h27.412v19.965h1.227c2.21-6.955 5.974-12.274 11.292-16.038 5.319-3.763 11.456-5.645 18.329-5.645 1.555 0 3.355.082 5.237.163 1.964.164 3.601.328 4.91.573v25.938c-1.227-.41-3.109-.819-5.646-1.146a58.814 58.814 0 0 0-7.446-.49c-5.155 0-9.738 1.145-13.829 3.354-4.091 2.209-7.282 5.236-9.655 9.164-2.373 3.927-3.519 8.427-3.519 13.5v70.448h-28.312ZM222.077 39.192l-8.019 125.923L137.387 0l84.69 39.192Zm-53.105 162.825-57.933 33.056-57.934-33.056 11.783-28.556h92.301l11.783 28.556ZM111.039 62.675l30.357 73.803H80.681l30.358-73.803ZM7.937 165.115 0 39.192 84.69 0 7.937 165.115Z"
-          />
-        </g>
-        <defs>
-          <radialGradient
-            id="c"
-            cx="0"
-            cy="0"
-            r="1"
-            gradientTransform="rotate(118.122 171.182 60.81) scale(205.794)"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stop-color="#FF41F8" />
-            <stop offset=".707" stop-color="#FF41F8" stop-opacity=".5" />
-            <stop offset="1" stop-color="#FF41F8" stop-opacity="0" />
-          </radialGradient>
-          <linearGradient
-            id="b"
-            x1="0"
-            x2="982"
-            y1="192"
-            y2="192"
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop stop-color="#F0060B" />
-            <stop offset="0" stop-color="#F0070C" />
-            <stop offset=".526" stop-color="#CC26D5" />
-            <stop offset="1" stop-color="#7702FF" />
-          </linearGradient>
-          <clipPath id="a"><path fill="#fff" d="M0 0h982v239H0z" /></clipPath>
-        </defs>
-      </svg>
-      <h1>Hello, {{ title }}</h1>
-      <p>Congratulations! Your app is running. 🎉</p>
-    </div>
-    <div class="divider" role="separator" aria-label="Divider"></div>
-    <div class="right-side">
-      <div class="pill-group">
-        @for (item of [
-          { title: 'Explore the Docs', link: 'https://angular.dev' },
-          { title: 'Learn with Tutorials', link: 'https://angular.dev/tutorials' },
-          { title: 'CLI Docs', link: 'https://angular.dev/tools/cli' },
-          { title: 'Angular Language Service', link: 'https://angular.dev/tools/language-service' },
-          { title: 'Angular DevTools', link: 'https://angular.dev/tools/devtools' },
-        ]; track item.title) {
-          <a
-            class="pill"
-            [href]="item.link"
-            target="_blank"
-            rel="noopener"
-          >
-            <span>{{ item.title }}</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="14"
-              viewBox="0 -960 960 960"
-              width="14"
-              fill="currentColor"
-            >
-              <path
-                d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h560v-280h80v280q0 33-23.5 56.5T760-120H200Zm188-212-56-56 372-372H560v-80h280v280h-80v-144L388-332Z"
-              />
-            </svg>
-          </a>
-        }
-      </div>
-      <div class="social-links">
-        <a
-          href="https://github.com/angular/angular"
-          aria-label="Github"
-          target="_blank"
-          rel="noopener"
-        >
-          <svg
-            width="25"
-            height="24"
-            viewBox="0 0 25 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            alt="Github"
-          >
-            <path
-              d="M12.3047 0C5.50634 0 0 5.50942 0 12.3047C0 17.7423 3.52529 22.3535 8.41332 23.9787C9.02856 24.0946 9.25414 23.7142 9.25414 23.3871C9.25414 23.0949 9.24389 22.3207 9.23876 21.2953C5.81601 22.0377 5.09414 19.6444 5.09414 19.6444C4.53427 18.2243 3.72524 17.8449 3.72524 17.8449C2.61064 17.082 3.81137 17.0973 3.81137 17.0973C5.04697 17.1835 5.69604 18.3647 5.69604 18.3647C6.79321 20.2463 8.57636 19.7029 9.27978 19.3881C9.39052 18.5924 9.70736 18.0499 10.0591 17.7423C7.32641 17.4347 4.45429 16.3765 4.45429 11.6618C4.45429 10.3185 4.9311 9.22133 5.72065 8.36C5.58222 8.04931 5.16694 6.79833 5.82831 5.10337C5.82831 5.10337 6.85883 4.77319 9.2121 6.36459C10.1965 6.09082 11.2424 5.95546 12.2883 5.94931C13.3342 5.95546 14.3801 6.09082 15.3644 6.36459C17.7023 4.77319 18.7328 5.10337 18.7328 5.10337C19.3942 6.79833 18.9789 8.04931 18.8559 8.36C19.6403 9.22133 20.1171 10.3185 20.1171 11.6618C20.1171 16.3888 17.2409 17.4296 14.5031 17.7321C14.9338 18.1012 15.3337 18.8559 15.3337 20.0084C15.3337 21.6552 15.3183 22.978 15.3183 23.3779C15.3183 23.7009 15.5336 24.0854 16.1642 23.9623C21.0871 22.3484 24.6094 17.7341 24.6094 12.3047C24.6094 5.50942 19.0999 0 12.3047 0Z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://twitter.com/angular"
-          aria-label="Twitter"
-          target="_blank"
-          rel="noopener"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            alt="Twitter"
-          >
-            <path
-              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://www.youtube.com/channel/UCbn1OgGei-DV7aSRo_HaAiw"
-          aria-label="Youtube"
-          target="_blank"
-          rel="noopener"
-        >
-          <svg
-            width="29"
-            height="20"
-            viewBox="0 0 29 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            alt="Youtube"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M27.4896 1.52422C27.9301 1.96749 28.2463 2.51866 28.4068 3.12258C29.0004 5.35161 29.0004 10 29.0004 10C29.0004 10 29.0004 14.6484 28.4068 16.8774C28.2463 17.4813 27.9301 18.0325 27.4896 18.4758C27.0492 18.9191 26.5 19.2389 25.8972 19.4032C23.6778 20 14.8068 20 14.8068 20C14.8068 20 5.93586 20 3.71651 19.4032C3.11363 19.2389 2.56449 18.9191 2.12405 18.4758C1.68361 18.0325 1.36732 17.4813 1.20683 16.8774C0.613281 14.6484 0.613281 10 0.613281 10C0.613281 10 0.613281 5.35161 1.20683 3.12258C1.36732 2.51866 1.68361 1.96749 2.12405 1.52422C2.56449 1.08095 3.11363 0.76113 3.71651 0.596774C5.93586 0 14.8068 0 14.8068 0C14.8068 0 23.6778 0 25.8972 0.596774C26.5 0.76113 27.0492 1.08095 27.4896 1.52422ZM19.3229 10L11.9036 5.77905V14.221L19.3229 10Z"
-            />
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
-</main>
-
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-
-
-<router-outlet />
-</file>
-
-<file path="src/app/app.component.scss">
-
-</file>
-
-<file path="src/app/app.component.spec.ts">
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
-</file>
-
-<file path="src/app/app.component.ts">
-import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './shared/components/header/header.component';
-import { LanguageService } from './core/services/language.service';
-⋮----
-export class AppComponent {
-⋮----
-ngOnInit(): void
-</file>
-
-<file path="src/app/app.config.server.ts">
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
-import { provideServerRendering } from '@angular/platform-server';
-import { provideServerRouting } from '@angular/ssr';
-import { appConfig } from './app.config';
-import { serverRoutes } from './app.routes.server';
-</file>
-
-<file path="src/app/app.config.ts">
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient, HttpClient } from '@angular/common/http';
-import { routes } from './app.routes';
-⋮----
-import { importProvidersFrom } from '@angular/core';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
-import { Observable } from 'rxjs';
-⋮----
-export class JsonLoader implements TranslateLoader {
-⋮----
-constructor(private http: HttpClient)
-⋮----
-getTranslation(lang: string): Observable<any>
-</file>
-
-<file path="src/app/app.routes.server.ts">
-import { RenderMode, ServerRoute } from '@angular/ssr';
-</file>
-
-<file path="src/app/app.routes.ts">
-import { Routes } from '@angular/router';
-⋮----
-loadComponent: () => import('./features/about/about.component').then(c => c.AboutComponent)  // Updated
 </file>
 
 <file path="src/index.html">
@@ -3624,59 +4175,10 @@ loadComponent: () => import('./features/about/about.component').then(c => c.Abou
 </html>
 </file>
 
-<file path="src/main.server.ts">
-import { BootstrapContext, bootstrapApplication } from '@angular/platform-browser';
-import { AppComponent } from './app/app.component';
-import { config } from './app/app.config.server';
-⋮----
-const bootstrap = (context: BootstrapContext)
-</file>
-
 <file path="src/main.ts">
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-</file>
-
-<file path="src/server.ts">
-import {
-  AngularNodeAppEngine,
-  createNodeRequestHandler,
-  isMainModule,
-  writeResponseToNodeResponse,
-} from '@angular/ssr/node';
-import express from 'express';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-⋮----
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
-⋮----
-/**
- * Serve static files from /browser
- */
-⋮----
-/**
- * Handle all other requests by rendering the Angular application.
- */
-⋮----
-/**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
- */
-⋮----
-/**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
- */
 </file>
 
 <file path="src/styles.scss">
@@ -3744,9 +4246,7 @@ html {
     ]
   },
   "files": [
-    "src/main.ts",
-    "src/main.server.ts",
-    "src/server.ts"
+    "src/main.ts"
   ],
   "include": [
     "src/**/*.d.ts"
@@ -3761,6 +4261,7 @@ html {
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
+    "rootDir": "./src", 
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

@@ -1,192 +1,396 @@
+$gold:        #d4af37;
+$gold-faint:  rgba(212, 175, 55, 0.12);
+$gold-border: rgba(212, 175, 55, 0.25);
+$dark-card:   rgba(26, 26, 26, 0.75);
+$text-muted:  rgba(255, 255, 255, 0.5);
+$text-body:   rgba(255, 255, 255, 0.88);
+$grid-line:   rgba(212, 175, 55, 0.03);
+
 .history-container {
   min-height: calc(100vh - 80px);
   background-color: #0f0f0f;
+  background-image:
+    repeating-linear-gradient(90deg, $grid-line 0px, transparent 1px, transparent 40px, $grid-line 41px),
+    repeating-linear-gradient(0deg,  $grid-line 0px, transparent 1px, transparent 40px, $grid-line 41px);
   padding: 3rem;
-  background-image: 
-    repeating-linear-gradient(
-      90deg,
-      rgba(212, 175, 55, 0.03) 0px,
-      transparent 1px,
-      transparent 40px,
-      rgba(212, 175, 55, 0.03) 41px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(212, 175, 55, 0.03) 0px,
-      transparent 1px,
-      transparent 40px,
-      rgba(212, 175, 55, 0.03) 41px
-    );
+
+  // ── Page header ──────────────────────────────────────────────
+  .page-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 
   .page-title {
-    font-size: 3.5rem;
-    color: #d4af37;
-    margin-bottom: 2rem;
+    font-size: 3rem;
+    color: $gold;
     font-weight: 300;
   }
 
+  .clear-all-btn {
+    background: transparent;
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    color: rgba(255, 100, 100, 0.8);
+    padding: 0.5rem 1.4rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+
+    &:hover {
+      background: rgba(220, 53, 69, 0.15);
+      border-color: rgba(220, 53, 69, 0.7);
+      color: #ff6b6b;
+    }
+  }
+
+  // ── Controls ─────────────────────────────────────────────────
   .controls {
     display: flex;
-    gap: 2rem;
-    margin-bottom: 3rem;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
 
-    .search-box {
-      flex: 1;
-      max-width: 400px;
-      
-      input {
-        width: 100%;
-        background-color: rgba(26, 26, 26, 0.6);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        color: white;
-        padding: 0.9rem 1.3rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: all 0.3s;
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 440px;
 
-        &::placeholder {
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        &:focus {
-          outline: none;
-          border-color: #d4af37;
-          background-color: rgba(26, 26, 26, 0.8);
-          box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-      }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
     }
 
-    .sort-box {
-      select {
-        background-color: rgba(26, 26, 26, 0.6);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        color: white;
-        padding: 0.9rem 2.5rem 0.9rem 1.3rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d4af37' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
+    input {
+      width: 100%;
+      background: $dark-card;
+      border: 1px solid $gold-border;
+      color: white;
+      padding: 0.85rem 1rem 0.85rem 2.8rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.25s;
 
-        &:focus {
-          outline: none;
-          border-color: #d4af37;
-          background-color: rgba(26, 26, 26, 0.8);
-          box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
+      &::placeholder { color: $text-muted; }
 
-        &:hover {
-          border-color: rgba(212, 175, 55, 0.5);
-        }
-
-        option {
-          background-color: #1a1a1a;
-          color: white;
-        }
+      &:focus {
+        outline: none;
+        border-color: $gold;
+        box-shadow: 0 0 18px rgba(212, 175, 55, 0.15);
       }
     }
   }
 
-  .no-results {
-    text-align: center;
-    padding: 5rem 2rem;
-    color: rgba(255, 255, 255, 0.6);
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
 
-    .no-results-icon {
-      font-size: 4rem;
+    .tab {
+      background: transparent;
+      border: 1px solid $gold-border;
+      color: $text-muted;
+      padding: 0.6rem 1.2rem;
+      border-radius: 25px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+
+      &:hover { border-color: rgba(212, 175, 55, 0.5); color: rgba(255,255,255,0.8); }
+
+      &.active {
+        background: $gold-faint;
+        border-color: $gold;
+        color: $gold;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // ── Empty state ───────────────────────────────────────────────
+  .empty-state {
+    text-align: center;
+    padding: 6rem 2rem;
+
+    .empty-icon-svg {
       margin-bottom: 1.5rem;
-      opacity: 0.5;
+      opacity: 0.6;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     h3 {
       font-size: 1.8rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 0.5rem;
+      color: rgba(255,255,255,0.7);
       font-weight: 400;
+      margin-bottom: 0.75rem;
     }
 
-    p {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.5);
+    p { font-size: 1.1rem; color: $text-muted; }
+  }
+
+  // ── Sessions list ─────────────────────────────────────────────
+  .sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .session-card {
+    background: $dark-card;
+    border: 1px solid $gold-border;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    border-left: 4px solid transparent;
+
+    &.artifact { border-left-color: $gold; }
+    &.chat     { border-left-color: rgba(100, 180, 255, 0.65); }
+
+    &:hover {
+      border-color: rgba(212, 175, 55, 0.45);
+      box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
     }
   }
 
-  .artifacts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+  // ── Session header ────────────────────────────────────────────
+  .session-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
 
-    .artifact-card {
-      background-color: rgba(26, 26, 26, 0.8);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s;
+  .session-thumb {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid $gold-border;
+  }
 
-      &:hover {
-        transform: translateY(-5px);
-        border-color: #d4af37;
-        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-      }
+  .session-thumb-placeholder {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+    background: rgba(212, 175, 55, 0.07);
+    border: 1px solid $gold-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 
-      .artifact-image {
-        width: 100%;
-        height: 250px;
-        background-color: #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
+  .session-info {
+    flex: 1;
 
-      .artifact-info {
-        padding: 1.5rem;
+    .session-name {
+      font-size: 1.25rem;
+      color: $gold;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
 
-        h3 {
-          color: #d4af37;
-          font-size: 1.5rem;
-          margin-bottom: 0.5rem;
-          font-weight: 400;
-        }
+    .session-date {
+      font-size: 1rem;       // bigger as requested
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 0.2rem;
+    }
 
-        .date {
-          color: rgba(255, 255, 255, 0.6);
-          font-size: 0.95rem;
-        }
-      }
+    .session-count {
+      font-size: 0.83rem;
+      color: $text-muted;
     }
   }
 
-  // Responsive
+  .source-chip {
+    align-self: flex-start;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    flex-shrink: 0;
+
+    &.artifact {
+      background: $gold-faint;
+      color: $gold;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    &.chat {
+      background: rgba(100, 180, 255, 0.08);
+      color: rgba(140, 200, 255, 0.9);
+      border: 1px solid rgba(100, 180, 255, 0.25);
+    }
+  }
+
+  // ── Exchanges list ────────────────────────────────────────────
+  .exchanges-list {
+    padding: 1rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .exchange-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+  }
+
+  .qa-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .qa-label {
+    flex-shrink: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 0.85rem;
+
+    &.q-label {
+      background: rgba(212, 175, 55, 0.14);
+      color: $gold;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    &.a-label {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+  }
+
+  .qa-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .question-text {
+    color: $text-body;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .answer-text {
+    color: $text-muted;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .exchange-time {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.28);
+  }
+
+  .toggle-btn {
+    background: transparent;
+    border: none;
+    color: $gold;
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s;
+    text-align: start;
+
+    &:hover { opacity: 0.7; }
+  }
+
+  .no-exchanges {
+    padding: 1rem 1.5rem;
+    color: $text-muted;
+    font-size: 0.95rem;
+    font-style: italic;
+  }
+
+
+  // ── Session footer (delete) ───────────────────────────────────
+  .session-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.65rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .delete-session-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: rgba(255, 100, 100, 0.7);
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(220, 53, 69, 0.12);
+      border-color: rgba(220, 53, 69, 0.6);
+      color: #ff6b6b;
+    }
+  }
+
+  // ── Footer count ──────────────────────────────────────────────
+  .record-count {
+    text-align: center;
+    color: $text-muted;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+  }
+
+  // ── Responsive ────────────────────────────────────────────────
   @media (max-width: 768px) {
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.25rem;
 
-    .page-title {
-      font-size: 2.5rem;
-    }
+    .page-title { font-size: 2.2rem; }
 
     .controls {
       flex-direction: column;
-      gap: 1rem;
+      align-items: stretch;
 
-      .search-box {
-        max-width: 100%;
-      }
+      .search-box { max-width: 100%; }
+      .filter-tabs { flex-wrap: wrap; }
     }
 
-    .artifacts-grid {
-      grid-template-columns: 1fr;
-    }
+    .session-thumb,
+    .session-thumb-placeholder { width: 56px; height: 56px; }
+
+    .session-header { gap: 1rem; padding: 1rem; }
+    .exchanges-list { padding: 0.75rem 1rem 1rem; }
   }
 }

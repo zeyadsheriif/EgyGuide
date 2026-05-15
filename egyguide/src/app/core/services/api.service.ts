@@ -23,41 +23,51 @@ export interface ChatResponse {
   providedIn: 'root'
 })
 export class ApiService {
+
   private http = inject(HttpClient);
-  private baseUrl = environment.apiUrl;
+
+  // Local backend for image upload/classification
+  private uploadBaseUrl = environment.uploadApiUrl;
+
+  // Colab GPU backend for chats
+  private chatBaseUrl = environment.chatApiUrl;
 
   /**
    * Upload artifact image for analysis
    */
   uploadArtifact(file: File): Observable<UploadResponse> {
+
     const formData = new FormData();
     formData.append('image', file);
 
     return this.http.post<UploadResponse>(
-      `${this.baseUrl}/api/upload`,
+      `${this.uploadBaseUrl}/api/upload`,
       formData
     );
   }
 
   /**
-   * Send chat message about uploaded artifact (context-aware)
-   * Use after image upload - backend knows which artifact you're asking about
+   * Send chat message about uploaded artifact
+   * Uses Colab GPU backend
    */
   sendChatMessage(question: string): Observable<ChatResponse> {
+
     return this.http.post<ChatResponse>(
-      `${this.baseUrl}/api/chat`,
+      `${this.chatBaseUrl}/api/chat`,
       { question }
     );
   }
 
   /**
-   * Send general chat message to LLM (no artifact context)
-   * Use for standalone chat page - general Egyptian history questions
+   * General standalone AI chat
+   * Uses Colab GPU backend
    */
   sendLLMChatMessage(question: string): Observable<ChatResponse> {
+
     return this.http.post<ChatResponse>(
-      `${this.baseUrl}/api/llm-chat`,
+      `${this.chatBaseUrl}/api/llm-chat`,
       { question }
     );
   }
+
 }

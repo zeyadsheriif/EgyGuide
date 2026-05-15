@@ -2,6 +2,7 @@
   <div class="logo">
     <span class="logo-egy">Egy</span><span class="logo-guide">Guide</span>
   </div>
+
   <nav class="nav">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">{{ 'nav.home' | translate }}</a>
     <a routerLink="/chat" routerLinkActive="active">{{ 'nav.chat' | translate }}</a>
@@ -9,21 +10,42 @@
     <a routerLink="/about" routerLinkActive="active">{{ 'nav.about' | translate }}</a>
   </nav>
 
+  <!-- Language Dropdown -->
   <div class="lang-switcher">
     <button
-      class="lang-btn"
-      [class.active]="currentLang() === 'en'"
-      (click)="switchLanguage('en')"
+      class="lang-selected"
+      (click)="toggleDropdown(); $event.stopPropagation()"
+      [attr.aria-expanded]="isDropdownOpen()"
     >
-      EN
+      <span class="lang-label">{{ 'lang.label' | translate }}</span>
+      <svg
+        class="lang-arrow"
+        [class.open]="isDropdownOpen()"
+        width="12" height="12" viewBox="0 0 12 12" fill="none"
+      >
+        <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </button>
-    <span class="lang-divider">|</span>
-    <button
-      class="lang-btn"
-      [class.active]="currentLang() === 'ar'"
-      (click)="switchLanguage('ar')"
-    >
-      AR
-    </button>
+
+    @if (isDropdownOpen()) {
+      <div class="lang-dropdown" (click)="$event.stopPropagation()">
+        @for (lang of languages; track lang.code) {
+          <button
+            class="lang-option"
+            [class.active]="currentLang() === lang.code"
+            (click)="selectLanguage(lang.code)"
+          >
+            <span class="option-label">{{ lang.label }}</span>
+            @if (currentLang() === lang.code) {
+              <svg class="check-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 7L5.5 10.5L12 3.5" stroke="#d4af37" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            }
+          </button>
+        }
+      </div>
+    }
   </div>
 </header>

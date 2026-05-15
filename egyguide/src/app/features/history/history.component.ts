@@ -1,8 +1,11 @@
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import {
+  Component, ChangeDetectionStrategy, signal,
+  inject, OnInit, computed
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { Artifact } from '../../core/models/artifact.model';
+import { HistoryService } from './history.service';
+import { ChatSession } from '../../core/models/artifact.model';
 
 @Component({
   selector: 'app-history',
@@ -13,45 +16,80 @@ import { Artifact } from '../../core/models/artifact.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoryComponent implements OnInit {
-  readonly #router = inject(Router);
+  private historyService = inject(HistoryService);
 
-  allArtifacts: Artifact[] = [];
-  artifacts = signal<Artifact[]>([]);
-  searchQuery = signal('');
-  sortMode = signal<'date' | 'name'>('date');
+  allSessions  = signal<ChatSession[]>([]);
+  searchQuery  = signal('');
+  activeFilter = signal<'all' | 'artifact' | 'chat'>('all');
+
+  /** Tracks which exchange answer is expanded: key = "sessionId-exchangeIndex" */
+  expandedKeys = signal<Set<string>>(new Set());
+
+  readonly PREVIEW_LEN = 200;
+
+  filteredSessions = computed(() => {
+    const q      = this.searchQuery().toLowerCase().trim();
+    const filter = this.activeFilter();
+
+    return this.allSessions().filter(s => {
+      const matchesFilter = filter === 'all' || s.source === filter;
+      const matchesQuery  = !q ||
+        (s.artifactName?.toLowerCase().includes(q) ?? false) ||
+        s.exchanges.some(e =>
+          e.question.toLowerCase().includes(q) ||
+          e.answer.toLowerCase().includes(q)
+        );
+      return matchesFilter && matchesQuery;
+    });
+  });
 
   ngOnInit(): void {
-    const stored = localStorage.getItem('artifactHistory');
-    this.allArtifacts = stored ? JSON.parse(stored) : [];
-    this.artifacts.set(this.allArtifacts);
+    this.allSessions.set(this.historyService.getAll());
   }
 
   onSearch(event: Event): void {
-    const query = (event.target as HTMLInputElement).value.toLowerCase();
-    this.searchQuery.set(query);
-    this.applyFilter();
+    this.searchQuery.set((event.target as HTMLInputElement).value);
   }
 
-  onSortChange(event: Event): void {
-    const value = (event.target as HTMLSelectElement).value as 'date' | 'name';
-    this.sortMode.set(value);
-    this.applyFilter();
+  setFilter(f: 'all' | 'artifact' | 'chat'): void {
+    this.activeFilter.set(f);
   }
 
-  applyFilter(): void {
-    const query = this.searchQuery();
-    let filtered = this.allArtifacts.filter(a =>
-      a.landmark?.toLowerCase().includes(query) ||
-      a.location?.toLowerCase().includes(query) ||
-      a.pharaoh?.toLowerCase().includes(query)
-    );
-    if (this.sortMode() === 'name') {
-      filtered = filtered.sort((a, b) => a.landmark.localeCompare(b.landmark));
-    }
-    this.artifacts.set(filtered);
+  /** Toggle expand/collapse for a single exchange answer */
+  toggleExpand(sessionId: string, index: number): void {
+    const key = `${sessionId}-${index}`;
+    this.expandedKeys.update(keys => {
+      const next = new Set(keys);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
   }
 
-  onArtifactClick(id: string): void {
-    this.#router.navigate(['/artifact', id]);
+  isExpanded(sessionId: string, index: number): boolean {
+    return this.expandedKeys().has(`${sessionId}-${index}`);
+  }
+
+  preview(text: string): string {
+    return text.length > this.PREVIEW_LEN
+      ? text.slice(0, this.PREVIEW_LEN) + '…'
+      : text;
+  }
+
+  deleteSession(id: string): void {
+    this.historyService.deleteSession(id);
+    this.allSessions.set(this.historyService.getAll());
+    // Clean up expand keys for this session
+    this.expandedKeys.update(keys => {
+      const next = new Set(keys);
+      [...next].filter(k => k.startsWith(id)).forEach(k => next.delete(k));
+      return next;
+    });
+  }
+
+  clearAll(): void {
+    if (!window.confirm('Clear all conversation history? This cannot be undone.')) return;
+    this.historyService.clearAll();
+    this.allSessions.set([]);
+    this.expandedKeys.set(new Set());
   }
 }

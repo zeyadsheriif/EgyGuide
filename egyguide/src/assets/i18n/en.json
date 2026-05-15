@@ -8,7 +8,10 @@
   "lang": {
     "label": "Language",
     "en": "English",
-    "ar": "Arabic"
+    "ar": "العربية",
+    "fr": "Français",
+    "zh": "中文",
+    "de": "Deutsch"
   },
   "home": {
     "line1": "Unveil the Secrets of",
@@ -18,10 +21,12 @@
   },
   "upload": {
     "dragDrop": "Drag & Drop your artifact image here",
-    "takePhoto": "Take Photo",
     "or": "or",
     "browse": "Browse Files",
     "fileInfo": "Supports JPG, PNG. Max size 10MB.",
+    "capture": "Capture",
+    "cancel": "Cancel",
+    "takePhoto": "Take Photo",
     "unknownTitle": "Artifact Not Recognized",
     "unknownText": "This image is not part of our trained Egyptian artifacts. Please try another image.",
     "tryAgain": "Try Another Image"
@@ -40,7 +45,8 @@
     "sending": "Sending...",
     "suggestedQ1": "Tell me more about this artifact",
     "suggestedQ2": "What is its dynasty?",
-    "suggestedQ3": "Where is it located?"
+    "suggestedQ3": "Where is it located?",
+    "welcome": "Welcome! Ask me anything about {{name}}."
   },
   "chat": {
     "title": "Chat with",
@@ -51,7 +57,8 @@
     "sending": "Sending...",
     "suggestedQ1": "Tell me about the pyramids of Giza",
     "suggestedQ2": "Who was Cleopatra?",
-    "suggestedQ3": "Who is Ramessess II"
+    "suggestedQ3": "Who is Ramessess II",
+    "suggestedQ4": "Tell me about the Valley of the Kings"
   },
   "history": {
     "title": "My Exploration History",
@@ -59,7 +66,23 @@
     "sortByDate": "Sort by: Date",
     "sortByName": "Sort by: Name",
     "noResults": "No artifacts found",
-    "adjustSearch": "Try adjusting your search terms"
+    "adjustSearch": "Try adjusting your search terms",
+    "noHistory": "No conversations yet",
+    "startExploring": "Start exploring artifacts or chatting — your Q&A history will appear here",
+    "filterAll": "All",
+    "filterArtifact": "Artifact Sessions",
+    "filterChat": "General Chat",
+    "sourceArtifact": "Artifact",
+    "sourceChat": "General Chat",
+    "question": "Q",
+    "answer": "A",
+    "delete": "Delete",
+    "clearAll": "Clear All",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "exchange": "exchange",
+    "exchanges": "exchanges",
+    "noExchanges": "No questions asked yet"
   },
   "about": {
     "title": "About",
@@ -83,6 +106,7 @@
     "feature3Desc": "Access detailed historical context, timelines, and cultural significance for every artifact and monument in our database.",
     "techTitle": "Technology Stack",
     "techDesc": "Built with modern AI technologies and frameworks",
+    "footerTagline": "Bridging the ancient and the modern through AI",
     "contactTitle": "Get In Touch",
     "email": "Email",
     "universityName": "Zewail City of Science and Technology",
@@ -91,7 +115,6 @@
     "programClass": "Class of 2026",
     "contactMessageTitle": "Interested in our project?",
     "contactMessageText": "We welcome feedback, collaboration opportunities, and questions about EgyGuide. Whether you're an educator, historian, or technology enthusiast, we'd love to hear from you.",
-    "contactClosing": "This project is part of our ongoing commitment to using artificial intelligence for cultural preservation and education.",
-    "footerTagline": "Bridging the ancient and the modern through AI"
+    "contactClosing": "This project is part of our ongoing commitment to using artificial intelligence for cultural preservation and education."
   }
 }

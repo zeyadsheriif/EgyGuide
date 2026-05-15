@@ -1,4 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://contractedly-unblemishable-anitra.ngrok-free.dev'
+  uploadApiUrl: 'https://approve-reapprove-cubical.ngrok-free.dev',
+
+  chatApiUrl: 'https://contractedly-unblemishable-anitra.ngrok-free.dev'
 };

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ApiService } from '../../core/services/api.service';
+import { HistoryService } from '../history/history.service';
 import { ChatMessage } from '../../core/models/artifact.model';
 
 @Component({
@@ -14,14 +15,15 @@ import { ChatMessage } from '../../core/models/artifact.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatComponent {
-  readonly #apiService = inject(ApiService);
-  readonly #translate = inject(TranslateService);
+  private apiService     = inject(ApiService);
+  private translateSvc   = inject(TranslateService);
+  private historyService = inject(HistoryService);
 
-  chatMessages = signal<ChatMessage[]>([]);
-  isLoading = signal(false);
-  userMessage = '';
+  chatMessages   = signal<ChatMessage[]>([]);
+  isLoading      = signal(false);
+  userMessage    = '';
+  private sessionStarted = false;
 
-  // Translation keys used via | translate in template
   suggestedQuestions = [
     'chat.suggestedQ1',
     'chat.suggestedQ2',
@@ -29,22 +31,29 @@ export class ChatComponent {
   ];
 
   sendMessage(): void {
-    if (!this.userMessage.trim() || this.isLoading()) return;
+    const question = this.userMessage.trim();
+    if (!question || this.isLoading()) return;
 
-    const question = this.userMessage;
+    // Start a general-chat session on the very first message of this visit
+    if (!this.sessionStarted) {
+      this.historyService.startSession({ source: 'chat' });
+      this.sessionStarted = true;
+    }
 
-    // Add user message
     this.chatMessages.update(msgs => [...msgs, { role: 'user', content: question }]);
-
-    // Clear input
     this.userMessage = '';
     this.isLoading.set(true);
 
-    // Send to LLM chat endpoint (general Egyptian history)
-    this.#apiService.sendLLMChatMessage(question).subscribe({
+    this.apiService.sendLLMChatMessage(question).subscribe({
       next: (response) => {
-        this.chatMessages.update(msgs => [...msgs, { role: 'assistant', content: response.answer }]);
+        this.chatMessages.update(msgs => [
+          ...msgs,
+          { role: 'assistant', content: response.answer }
+        ]);
         this.isLoading.set(false);
+
+        // Append to the current session
+        this.historyService.addExchange({ question, answer: response.answer });
       },
       error: () => {
         this.isLoading.set(false);
@@ -53,8 +62,7 @@ export class ChatComponent {
   }
 
   sendSuggestedQuestion(questionKey: string): void {
-    const translated = this.#translate.instant(questionKey); 
-    this.userMessage = translated;
+    this.userMessage = this.translateSvc.instant(questionKey);
     this.sendMessage();
   }
 }
