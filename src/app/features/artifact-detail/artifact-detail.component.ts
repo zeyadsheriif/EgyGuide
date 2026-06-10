@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ApiService } from '../../core/services/api.service';
+import { ApiService, FeedbackRequest } from '../../core/services/api.service';
 import { HistoryService } from '../history/history.service';
 import { Artifact, ChatMessage } from '../../core/models/artifact.model';
 
@@ -25,9 +25,11 @@ export class ArtifactDetailComponent implements OnInit {
   artifact     = signal<Artifact | null>(null);
   chatMessages = signal<ChatMessage[]>([]);
   isLoading    = signal(false);
+  isThinking   = signal(false);
   userMessage  = '';
 
-  readonly isThinking = signal(false);
+  // Tracks which message index has received feedback: 'up' | 'down'
+  feedbackState = signal<Record<number, 'up' | 'down'>>({});
 
   suggestedQuestions = [
     'detail.suggestedQ1',
@@ -63,18 +65,51 @@ export class ArtifactDetailComponent implements OnInit {
     this.chatMessages.update(msgs => [...msgs, { role: 'user', content: question }]);
     this.userMessage = '';
     this.isLoading.set(true);
-    this.isThinking.set(true);  
+    this.isThinking.set(true);
 
     this.apiService.sendChatMessage(question).subscribe({
       next: (response) => {
-        this.isThinking.set(false);   
+        this.isThinking.set(false);
         this.chatMessages.update(msgs => [...msgs, { role: 'assistant', content: response.answer }]);
         this.isLoading.set(false);
       },
       error: () => {
-        this.isThinking.set(false); 
+        this.isThinking.set(false);
         this.chatMessages.update(msgs => [...msgs, { role: 'assistant', content: 'Sorry, I could not retrieve information at this time.' }]);
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  sendFeedback(messageIndex: number, rating: 'up' | 'down'): void {
+    // Prevent sending feedback twice for the same message
+    if (this.feedbackState()[messageIndex]) return;
+
+    const messages = this.chatMessages();
+    const assistantMessage = messages[messageIndex];
+
+    // Find the closest preceding user message as the question
+    let question = '';
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        question = messages[i].content;
+        break;
+      }
+    }
+
+    const payload: FeedbackRequest = {
+      question,
+      answer: assistantMessage.content,
+      rating
+    };
+
+    this.apiService.sendFeedback(payload).subscribe({
+      next: () => {
+        // Lock the button state so user can't change it after submission
+        this.feedbackState.update(state => ({ ...state, [messageIndex]: rating }));
+      },
+      error: (err) => {
+        console.error('Feedback error:', err);
       }
     });
   }
