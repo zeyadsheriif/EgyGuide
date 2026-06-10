@@ -1,0 +1,246 @@
+<div class="about-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="icon-wrapper">
+        <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+          <!-- Eye of Horus -->
+          <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+          <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+          <path d="M 90 50 Q 95 55, 93 62 Q 91 67, 86 65" stroke="#d4af37" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="main-title">{{ 'about.title' | translate }} <span class="highlight">{{ 'about.highlight' | translate }}</span></h1>
+      <p class="subtitle">{{ 'about.subtitle' | translate }}</p>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="mission-section">
+    <div class="content-wrapper">
+      <h2 class="section-title">{{ 'about.missionTitle' | translate }}</h2>
+      <p class="mission-text">
+        {{ 'about.missionText' | translate }}
+      </p>
+    </div>
+  </section>
+
+  <!-- University Section -->
+  <section class="university-section">
+    <div class="content-wrapper">
+      <h2 class="section-title">{{ 'about.academicTitle' | translate }}</h2>
+      <div class="university-info">
+        <div class="university-logo">
+          <div class="logo-placeholder">
+            <span class="university-initial">ZC</span>
+          </div>
+        </div>
+        <div class="university-details">
+          <h3>{{ 'about.university' | translate }}</h3>
+          <p class="program">{{ 'about.program' | translate }}</p>
+          <p class="project-type">{{ 'about.projectType' | translate }}</p>
+          <p class="description">
+            {{ 'about.projectDesc' | translate }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team-section">
+    <div class="content-wrapper">
+      <h2 class="section-title">{{ 'about.teamTitle' | translate }}</h2>
+      <p class="team-intro">
+        {{ 'about.teamIntro' | translate }}
+      </p>
+      <div class="team-grid">
+        @for (member of teamMembers; track member.name) {
+          <div class="team-card">
+            <div class="member-image">
+              <div class="image-placeholder">
+                <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <circle cx="40" cy="30" r="15" fill="#d4af37" opacity="0.3"/>
+                  <path d="M 15 60 Q 40 45, 65 60" fill="#d4af37" opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+            <h3 class="member-name">{{ member.name }}</h3>
+            <p class="member-role">{{ member.role }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section with Egyptian Icons -->
+  <section class="features-section">
+    <div class="content-wrapper">
+      <h2 class="section-title">{{ 'about.featuresTitle' | translate }}</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <!-- Image Recognition Eye -->
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+              <!-- Camera lens lines -->
+              <line x1="50" y1="35" x2="50" y2="42" stroke="#1a1a1a" stroke-width="2"/>
+              <line x1="50" y1="58" x2="50" y2="65" stroke="#1a1a1a" stroke-width="2"/>
+              <line x1="35" y1="50" x2="42" y2="50" stroke="#1a1a1a" stroke-width="2"/>
+              <line x1="58" y1="50" x2="65" y2="50" stroke="#1a1a1a" stroke-width="2"/>
+            </svg>
+          </div>
+          <h3>{{ 'about.feature1Title' | translate }}</h3>
+          <p>{{ 'about.feature1Desc' | translate }}</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <!-- Chat Eye with Speech -->
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+              <path d="M 90 50 Q 95 55, 93 62 Q 91 67, 86 65" stroke="#d4af37" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <!-- Chat bubbles -->
+              <circle cx="35" cy="25" r="3" fill="#d4af37" opacity="0.6"/>
+              <circle cx="45" cy="20" r="2.5" fill="#d4af37" opacity="0.5"/>
+              <circle cx="55" cy="18" r="2" fill="#d4af37" opacity="0.4"/>
+            </svg>
+          </div>
+          <h3>{{ 'about.feature2Title' | translate }}</h3>
+          <p>{{ 'about.feature2Desc' | translate }}</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <!-- Scroll/Database Eye -->
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+              <!-- Papyrus scroll -->
+              <path d="M 20 75 L 80 75 M 20 80 L 80 80 M 20 85 L 80 85" stroke="#d4af37" stroke-width="2" opacity="0.5"/>
+              <path d="M 18 73 Q 18 68, 22 68 L 78 68 Q 82 68, 82 73" stroke="#d4af37" stroke-width="2" fill="none"/>
+            </svg>
+          </div>
+          <h3>{{ 'about.feature3Title' | translate }}</h3>
+          <p>{{ 'about.feature3Desc' | translate }}</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <!-- Target/Personalized Eye -->
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+              <!-- Target rings -->
+              <circle cx="50" cy="50" r="25" stroke="#d4af37" stroke-width="2" fill="none" opacity="0.4"/>
+              <circle cx="50" cy="50" r="32" stroke="#d4af37" stroke-width="2" fill="none" opacity="0.3"/>
+            </svg>
+          </div>
+          <h3>{{ 'about.feature1Title' | translate }}</h3>
+          <p>{{ 'about.feature1Desc' | translate }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section with Egyptian Icons -->
+  <section class="contact-section">
+    <div class="content-wrapper">
+      <h2 class="section-title">{{ 'about.contactTitle' | translate }}</h2>
+
+      <div class="contact-content">
+        <!-- LEFT: INFO -->
+        <div class="contact-info">
+
+          <!-- Email -->
+          <div class="info-item">
+            <div class="info-icon">
+              <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                <path d="M 15 50 Q 50 25, 85 50" stroke="#d4af37" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <path d="M 15 50 Q 50 70, 85 50" stroke="#d4af37" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <circle cx="50" cy="50" r="12" fill="#d4af37"/>
+                <circle cx="50" cy="50" r="6" fill="#1a1a1a"/>
+                <text x="50" y="85" font-size="20" fill="#d4af37" text-anchor="middle" font-family="Arial">&#64;</text>
+              </svg>
+            </div>
+            <div class="info-details">
+              <h4>{{ 'about.email' | translate }}</h4>
+              <p>egyguide.team&#64;zewailcity.edu.eg</p>
+            </div>
+          </div>
+
+          <!-- University -->
+          <div class="info-item">
+            <div class="info-icon">
+              <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                <path d="M 50 20 L 85 75 L 15 75 Z" stroke="#d4af37" stroke-width="3" fill="none"/>
+                <path d="M 50 20 L 50 75" stroke="#d4af37" stroke-width="2"/>
+                <path d="M 32.5 47.5 L 67.5 47.5" stroke="#d4af37" stroke-width="2"/>
+                <circle cx="50" cy="35" r="5" fill="#d4af37"/>
+              </svg>
+            </div>
+            <div class="info-details">
+              <h4>{{ 'about.university' | translate }}</h4>
+              <p>{{ 'about.universityName' | translate }}</p>
+              <p class="sub-text">{{ 'about.universityAddress' | translate }}</p>
+            </div>
+          </div>
+
+          <!-- Program -->
+          <div class="info-item">
+            <div class="info-icon">
+              <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="30" r="12" stroke="#d4af37" stroke-width="3" fill="none"/>
+                <line x1="50" y1="42" x2="50" y2="85" stroke="#d4af37" stroke-width="3"/>
+                <line x1="30" y1="55" x2="70" y2="55" stroke="#d4af37" stroke-width="3"/>
+                <circle cx="50" cy="85" r="3" fill="#d4af37"/>
+              </svg>
+            </div>
+            <div class="info-details">
+              <h4>{{ 'about.program' | translate }}</h4>
+              <p>{{ 'about.programName' | translate }}</p>
+              <p class="sub-text">{{ 'about.programClass' | translate }}</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: MESSAGE -->
+        <div class="contact-message">
+          <div class="message-box">
+            <h3>{{ 'about.contactMessageTitle' | translate }}</h3>
+
+            <p>
+              {{ 'about.contactMessageText' | translate }}
+            </p>
+
+            <p class="closing-text">
+              {{ 'about.contactClosing' | translate }}
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="about-footer">
+    <div class="footer-content">
+      <p>&copy; 2026 EgyGuide - Zewail City University Graduation Project</p>
+      <p class="footer-tagline">{{ 'about.footerTagline' | translate }}</p>
+    </div>
+  </footer>
+</div>

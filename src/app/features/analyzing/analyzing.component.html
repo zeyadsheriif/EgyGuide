@@ -1,0 +1,32 @@
+<div class="analyzing-container">
+  <div class="content">
+    <div class="eye-icon">
+      <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
+        <!-- Eye of Horus SVG -->
+        <g class="glow">
+          <!-- Outer eye shape -->
+          <path d="M50 80 Q100 40, 150 80" stroke="#d4af37" stroke-width="4" fill="none"/>
+          <path d="M50 80 Q100 120, 150 80" stroke="#d4af37" stroke-width="4" fill="none"/>
+
+          <!-- Eye center -->
+          <circle cx="100" cy="80" r="15" fill="#d4af37"/>
+          <circle cx="100" cy="80" r="8" fill="#1a1a1a"/>
+
+          <!-- Decorative lines -->
+          <path d="M150 80 Q160 90, 155 100" stroke="#d4af37" stroke-width="3" fill="none"/>
+          <path d="M155 100 Q150 110, 145 105" stroke="#d4af37" stroke-width="3" fill="none"/>
+          <path d="M145 105 Q140 100, 145 95" stroke="#d4af37" stroke-width="3" fill="none"/>
+
+          <!-- Bottom spiral -->
+          <path d="M100 95 Q105 105, 110 100 Q115 95, 110 90" stroke="#d4af37" stroke-width="3" fill="none"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress()"></div>
+    </div>
+
+    <p class="status-text">{{ 'analyzing.status' | translate }}</p>
+  </div>
+</div>

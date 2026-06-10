@@ -1,0 +1,152 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
+
+  .logo {
+    font-size: 2rem;
+    font-weight: 300;
+
+    .logo-egy   { color: #fff; }
+    .logo-guide { color: #d4af37; }
+  }
+
+  .nav {
+    display: flex;
+    gap: 2.5rem;
+
+    a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: 1.4rem;
+      transition: color 0.3s;
+
+      &:hover,
+      &.active { color: #d4af37; }
+    }
+  }
+
+  // ── Language Dropdown ──────────────────────────────────────────
+  .lang-switcher {
+    position: relative;
+
+    // Trigger button
+    .lang-selected {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      border-radius: 8px;
+      color: #d4af37;
+      padding: 0.4rem 0.85rem;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      transition: background 0.25s, border-color 0.25s;
+
+      &:hover {
+        background: rgba(212, 175, 55, 0.1);
+        border-color: #d4af37;
+      }
+
+      .lang-label { font-size: 0.95rem; }
+
+      .lang-arrow {
+        color: rgba(212, 175, 55, 0.75);
+        transition: transform 0.25s ease;
+        flex-shrink: 0;
+
+        &.open { transform: rotate(180deg); }
+      }
+    }
+
+    // ── Dropdown panel ─────────────────────────────────────────
+    // inset-inline-end: 0  →  right:0 in LTR,  left:0 in RTL
+    // This single property replaces the old right:0 + :host-context RTL override,
+    // and works correctly in both directions with no extra blocks needed.
+    .lang-dropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      inset-inline-end: 0;    // ← the only change needed for RTL support
+      min-width: 185px;
+      background: #1c1c1c;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 1000;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(212, 175, 55, 0.06);
+      animation: dropdownIn 0.18s ease;
+
+      .lang-option {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        width: 100%;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.72);
+        padding: 0.7rem 1rem;
+        cursor: pointer;
+        font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
+        font-size: 1.05rem;
+        text-align: start;
+        transition: background 0.2s, color 0.2s;
+
+        &:last-child { border-bottom: none; }
+
+        .option-flag {
+          font-size: 1.25rem;
+          line-height: 1;
+          flex-shrink: 0;
+        }
+
+        .option-label { flex: 1; }
+
+        .check-icon {
+          flex-shrink: 0;
+          opacity: 0.9;
+        }
+
+        &:hover {
+          background: rgba(212, 175, 55, 0.1);
+          color: #d4af37;
+        }
+
+        &.active {
+          color: #d4af37;
+          background: rgba(212, 175, 55, 0.12);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// ── Animations ─────────────────────────────────────────────────────────────
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem 1.5rem;
+
+    .nav {
+      gap: 1.5rem;
+      a { font-size: 1.1rem; }
+    }
+  }
+}

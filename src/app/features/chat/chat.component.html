@@ -1,0 +1,133 @@
+<div class="chat-page">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>{{ 'chat.title' | translate }} <span class="highlight">{{ 'chat.highlight' | translate }}</span></h1>
+      <p class="subtitle">{{ 'chat.subtitle' | translate }}</p>
+    </div>
+
+    <div class="chat-messages">
+      @for (message of chatMessages(); track $index) {
+        <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+          @if (message.role === 'assistant') {
+            <div class="avatar">
+              <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+                <!-- Eye of Horus -->
+                <path d="M 15 40 Q 50 20, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <path d="M 15 40 Q 50 55, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+                <circle cx="50" cy="40" r="6" fill="#000"/>
+                <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                      stroke="#d4af37"
+                      stroke-width="3.5"
+                      fill="none"
+                      stroke-linecap="round"/>
+              </svg>
+            </div>
+          }
+          <div class="message-wrapper">
+            <div class="message-content">
+              {{ message.content }}
+            </div>
+            @if (message.role === 'assistant') {
+              <div class="feedback-actions" [class.locked]="feedbackState()[$index]">
+                <button
+                  class="feedback-btn thumbs-up"
+                  [class.active]="feedbackState()[$index] === 'up'"
+                  [disabled]="!!feedbackState()[$index]"
+                  (click)="sendFeedback($index, 'up')"
+                  title="Helpful"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                  </svg>
+                </button>
+                <button
+                  class="feedback-btn thumbs-down"
+                  [class.active]="feedbackState()[$index] === 'down'"
+                  [disabled]="!!feedbackState()[$index]"
+                  (click)="sendFeedback($index, 'down')"
+                  title="Not helpful"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (isThinking()) {
+        <div class="message assistant thinking-message">
+          <div class="avatar">
+            <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+              <!-- Eye of Horus -->
+              <path d="M 15 40 Q 50 20, 85 40"
+                    stroke="#d4af37"
+                    stroke-width="4"
+                    fill="none"
+                    stroke-linecap="round"/>
+              <path d="M 15 40 Q 50 55, 85 40"
+                    stroke="#d4af37"
+                    stroke-width="4"
+                    fill="none"
+                    stroke-linecap="round"/>
+              <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+              <circle cx="50" cy="40" r="6" fill="#000"/>
+              <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                    stroke="#d4af37"
+                    stroke-width="3.5"
+                    fill="none"
+                    stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="message-content thinking-bubble">
+            <span class="thinking-text">Consulting the ancient scrolls</span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="suggested-questions">
+      @for (question of suggestedQuestions; track question) {
+        <button
+          class="suggestion-btn"
+          (click)="sendSuggestedQuestion(question)"
+        >
+          {{ question | translate }}
+        </button>
+      }
+    </div>
+
+    <div class="chat-input">
+      <input
+        type="text"
+        [placeholder]="'chat.placeholder' | translate"
+        [(ngModel)]="userMessage"
+        (keyup.enter)="sendMessage()"
+        [disabled]="isLoading()"
+      >
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="isLoading()"
+      >
+        {{ (isLoading() ? 'chat.sending' : 'chat.send') | translate }}
+      </button>
+    </div>
+  </div>
+</div>
