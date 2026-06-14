@@ -100,3 +100,4 @@ export class ArtifactMockService {
     this.artifacts.update(artifacts => [artifact, ...artifacts]);
   }
 }
+
