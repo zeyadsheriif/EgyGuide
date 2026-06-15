@@ -22,10 +22,10 @@ The solution integrates two core AI technologies:
 
 | Name | ID | Role | Email |
 | :--- | :--- | :--- | :--- |
-| **Zeyad Sherif** | 202201220 | DL Model & Mobile Frontend | s-zeyad.gamal@zewailcity.edu.eg |
-| **Sama Mohamed** | 202201867 | NLP Model & Mobile Backend | s-sama.abdelhamid@zewailcity.edu.eg |
-| **Salma Wael** | 202201761 | DL Model & Web Frontend | s-salma.ramzy@zewailcity.edu.eg |
-| **Dana Amr** | 202201323 | NLP Model & Web Backend | s-dana.marei@zewailcity.edu.eg |
+| **Zeyad Sherif** | 202201220 | Vision Model & Vision model optimization | s-zeyad.gamal@zewailcity.edu.eg |
+| **Sama Mohamed** | 202201867 | LLM Model & RAG optimization | s-sama.abdelhamid@zewailcity.edu.eg |
+| **Salma Wael** | 202201761 | Vision Model & Web Frontend | s-salma.ramzy@zewailcity.edu.eg |
+| **Dana Amr** | 202201323 | LLM Model & Web Backend | s-dana.marei@zewailcity.edu.eg |
 
 ---
 
