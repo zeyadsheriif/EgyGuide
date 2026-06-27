@@ -40,7 +40,7 @@
     .icon {
       color: rgba(212, 175, 55, 0.6);
       margin-bottom: 2rem;
-      
+
       svg {
         filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
       }
@@ -84,6 +84,7 @@
       font-size: 0.95rem;
     }
   }
+
   .error-message {
     background-color: rgba(220, 53, 69, 0.2);
     border: 1px solid rgba(220, 53, 69, 0.5);
@@ -93,6 +94,7 @@
     margin-bottom: 1.5rem;
     text-align: center;
   }
+
   .unknown-card {
     margin-top: 30px;
     padding: 2rem;
@@ -103,7 +105,6 @@
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
-
     backdrop-filter: blur(10px);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
   }
@@ -159,7 +160,7 @@
     cursor: pointer;
     transition: all 0.3s;
     font-weight: 500;
-    min-width: 200px; 
+    min-width: 200px;
   }
 
   .browse-button:hover,
@@ -173,7 +174,7 @@
   .camera-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.9);
+    background: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -211,5 +212,37 @@
     color: white;
     padding: 0.8rem 2rem;
     border-radius: 25px;
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .upload-container {
+    padding: 1.5rem;
+
+    .drop-zone {
+      padding: 2.5rem 1.5rem;
+
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
+
+    .actions {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .browse-button,
+    .camera-button {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      min-width: 0;
+    }
+
+    video {
+      width: 100%;
+    }
   }
 }

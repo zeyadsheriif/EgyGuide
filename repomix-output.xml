@@ -76,6 +76,7 @@ src/app/features/chat/chat.component.ts
 src/app/features/history/history.component.html
 src/app/features/history/history.component.scss
 src/app/features/history/history.component.ts
+src/app/features/history/history.service.ts
 src/app/features/home/home.component.html
 src/app/features/home/home.component.scss
 src/app/features/home/home.component.ts
@@ -802,8 +803,8 @@ export enum AppRoutes {
 
 <file path="src/app/core/models/artifact.model.ts">
 export interface Artifact {
-  id: string;  
-  landmark: string;  // Changed from 'name' to 'landmark'
+  id: string;
+  landmark: string;
   imageUrl?: string;
   date?: string;
   dynasty: string;
@@ -812,8 +813,6 @@ export interface Artifact {
   description: string;
 }
 ⋮----
-landmark: string;  // Changed from 'name' to 'landmark'
-⋮----
 export interface ArtifactHistory {
   artifacts: Artifact[];
 }
@@ -821,6 +820,23 @@ export interface ArtifactHistory {
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+}
+⋮----
+/** One Q&A exchange inside a session */
+export interface ChatExchange {
+  question: string;
+  answer: string;
+  time: string;
+}
+⋮----
+/** A full conversation session (one artifact upload OR one general-chat visit) */
+export interface ChatSession {
+  id: string;
+  startDate: string;
+  source: 'artifact' | 'chat';
+  artifactName?: string;
+  imageUrl?: string;
+  exchanges: ChatExchange[];
 }
 </file>
 
@@ -846,7 +862,17 @@ export interface ChatResponse {
   answer: string;
 }
 ⋮----
+export interface FeedbackRequest {
+  question: string;
+  answer: string;
+  rating: string;
+}
+⋮----
 export class ApiService {
+⋮----
+// Local backend for image upload/classification
+⋮----
+// Colab GPU backend for chats
 ⋮----
 /**
    * Upload artifact image for analysis
@@ -854,29 +880,22 @@ export class ApiService {
 uploadArtifact(file: File): Observable<UploadResponse>
 ⋮----
 /**
-   * Send chat message about uploaded artifact (context-aware)
-   * Use after image upload - backend knows which artifact you're asking about
+   * Send chat message about uploaded artifact
+   * Uses Colab GPU backend
    */
 sendChatMessage(question: string): Observable<ChatResponse>
 ⋮----
 /**
-   * Send general chat message to LLM (no artifact context)
-   * Use for standalone chat page - general Egyptian history questions
+   * General standalone AI chat
+   * Uses Colab GPU backend
    */
 sendLLMChatMessage(question: string): Observable<ChatResponse>
-</file>
-
-<file path="src/app/core/services/artifact-mock.service.ts">
-import { Injectable, signal } from '@angular/core';
-import { Artifact } from '../models/artifact.model';
 ⋮----
-export class ArtifactMockService {
-⋮----
-getArtifacts()
-⋮----
-getArtifactById(id: string)
-⋮----
-addToHistory(artifact: Artifact)
+/**
+   * Send user feedback for an AI response
+   * Uses local backend (uploadApiUrl)
+   */
+sendFeedback(data: FeedbackRequest): Observable<void>
 </file>
 
 <file path="src/app/core/services/language.service.ts">
@@ -1733,512 +1752,6 @@ ngOnInit(): void
 // Navigate to artifact detail after completion
 </file>
 
-<file path="src/app/features/artifact-detail/artifact-detail.component.html">
-<div class="detail-container">
-  @if (artifact(); as art) {
-    <div class="left-panel">
-      <div class="artifact-image">
-        @if (art.imageUrl) {
-          <img [src]="art.imageUrl" [alt]="art.landmark" class="uploaded-image">
-        } @else {
-          <div class="image-placeholder">
-            <svg width="200" height="200" viewBox="0 0 100 100" fill="none">
-              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
-              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
-              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
-            </svg>
-          </div>
-        }
-      </div>
-
-      <h1 class="artifact-title">{{ art.landmark }}</h1>
-
-      <div class="quick-facts">
-        <h3>{{ 'detail.quickFacts' | translate }}</h3>
-        <ul>
-          @if (art.dynasty) {
-            <li><strong>{{ 'detail.dynasty' | translate }}:</strong> {{ art.dynasty }}</li>
-          }
-          @if (art.location) {
-            <li><strong>{{ 'detail.location' | translate }}:</strong> {{ art.location }}</li>
-          }
-          @if (art.description) {
-            <li><strong>{{ 'detail.description' | translate }}:</strong> {{ art.description }}</li>
-          }
-        </ul>
-      </div>
-    </div>
-
-    <div class="right-panel">
-      <div class="chat-header">
-        <h2>{{ 'detail.chatWith' | translate }} <span class="highlight">EgyGuide AI</span></h2>
-      </div>
-
-      <div class="chat-messages">
-        @for (message of chatMessages(); track $index) {
-          <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
-            @if (message.role === 'assistant') {
-              <div class="avatar">
-                <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
-                  <path d="M 15 40 Q 50 20, 85 40"
-                        stroke="#d4af37"
-                        stroke-width="4"
-                        fill="none"
-                        stroke-linecap="round"/>
-                  <path d="M 15 40 Q 50 55, 85 40"
-                        stroke="#d4af37"
-                        stroke-width="4"
-                        fill="none"
-                        stroke-linecap="round"/>
-                  <circle cx="50" cy="40" r="12" fill="#d4af37"/>
-                  <circle cx="50" cy="40" r="6" fill="#000"/>
-                  <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
-                        stroke="#d4af37"
-                        stroke-width="3.5"
-                        fill="none"
-                        stroke-linecap="round"/>
-                </svg>
-              </div>
-            }
-            <div class="message-content">
-              {{ message.content }}
-            </div>
-          </div>
-        }
-      </div>
-
-      <div class="suggested-questions">
-        @for (question of suggestedQuestions; track question) {
-          <button
-            class="suggestion-btn"
-            (click)="sendSuggestedQuestion(question)"
-          >
-            {{ question | translate }}
-          </button>
-        }
-      </div>
-
-      <div class="chat-input">
-        <input
-          type="text"
-          [placeholder]="'detail.placeholder' | translate"
-          [(ngModel)]="userMessage"
-          (keyup.enter)="sendMessage()"
-          [disabled]="isLoading()"
-        >
-        <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading()">
-          {{ (isLoading() ? 'detail.sending' : 'detail.send') | translate }}
-        </button>
-      </div>
-    </div>
-  }
-</div>
-</file>
-
-<file path="src/app/features/artifact-detail/artifact-detail.component.scss">
-.detail-container {
-  min-height: calc(100vh - 80px);
-  background-color: #0f0f0f;
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 1.5rem;
-  padding: 2rem;
-  align-items: start;  // Add this
-
-  .left-panel {
-    height: calc(100vh - 120px);  // Match right panel height
-    display: flex;
-    flex-direction: column;
-    
-  .artifact-image {
-    width: 100%;
-    height: 450px;
-    background-color: #000;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .uploaded-image {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
-    }
-
-    .image-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      
-      svg {
-        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
-      }
-    }
-  }
-
-    .artifact-title {
-      font-size: 2.5rem;
-      color: #d4af37;
-      margin-bottom: 1.5rem;
-      font-weight: 300;
-    }
-
-  .quick-facts {
-    background-color: rgba(26, 26, 26, 0.6);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 12px;
-    padding: 2rem;
-    flex: 1;
-
-    h3 {
-      color: #d4af37;
-      font-size: 2.8rem;
-      margin-bottom: 1.5rem;
-      font-weight: 800;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 1.3rem;
-        line-height: 1.8;
-        margin-bottom: 1rem;
-        padding-left: 1.5rem;
-        position: relative;
-
-        &:before {
-          content: '•';
-          color: #d4af37;
-          font-size: 1.3rem;
-          position: absolute;
-          left: 0;
-          top: -2px;
-        }
-
-        strong {
-          color: #d4af37;
-          font-weight: 550;
-          margin-right: 0.5rem;
-        }
-      }
-    }
-  }
-
-// Make sure uploaded image displays correctly
-.artifact-image {
-  width: 100%;
-  height: 450px;
-  background-color: #000;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .uploaded-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-  }
-
-  .image-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    svg {
-      filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
-    }
-  }
-}
-  }
-
-  .right-panel {
-    background-color: rgba(26, 26, 26, 0.6);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    height: calc(100vh - 120px);  // Fixed height to match left panel
-
-    .chat-header {
-      margin-bottom: 1.5rem;
-
-      h2 {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 1.5rem;
-        font-weight: 400;
-
-        .highlight {
-          color: #d4af37;
-        }
-      }
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 1.5rem;
-      padding-right: 1rem;
-
-      .message {
-        margin-bottom: 1.2rem;
-        display: flex;
-        gap: 1rem;
-
-        &.assistant {
-          .avatar {
-            flex-shrink: 0;
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(212, 175, 55, 0.1);
-            border-radius: 50%;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            
-            svg {
-              filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
-            }
-          }
-
-          .message-content {
-            background-color: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            color: rgba(255, 255, 255, 0.9);
-          }
-        }
-
-        &.user {
-          justify-content: flex-end;
-
-          .message-content {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.9);
-          }
-        }
-
-        .message-content {
-          padding: 1rem 1.5rem;  // Increased padding
-          border-radius: 12px;
-          max-width: 80%;
-          line-height: 1.6;  // Increased line height
-          font-size: 1.1rem;  // Increased from 0.95rem to 1.1rem
-        }
-      }
-    }
-
-    .suggested-questions {
-      display: flex;
-      gap: 0.8rem;
-      margin-bottom: 1.2rem;
-      flex-wrap: wrap;
-
-      .suggestion-btn {
-        background-color: transparent;
-        color: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        padding: 0.7rem 1.5rem;  // Increased padding
-        border-radius: 25px;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-size: 1rem;  // Increased from 0.9rem to 1rem
-
-        &:hover {
-          background-color: rgba(212, 175, 55, 0.1);
-          border-color: #d4af37;
-          color: #d4af37;
-        }
-      }
-    }
-
-    .chat-input {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-
-      input {
-        flex: 1;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        color: white;
-        padding: 1rem 1.5rem;  // Increased padding
-        border-radius: 25px;
-        font-size: 1.05rem;  // Increased from 0.95rem to 1.05rem
-
-        &::placeholder {
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        &:focus {
-          outline: none;
-          border-color: #d4af37;
-        }
-      }
-
-      .send-btn {
-        background-color: #d4af37;
-        color: #1a1a1a;
-        border: none;
-        padding: 1rem 2.5rem;  // Increased padding
-        border-radius: 25px;
-        font-size: 1.05rem;  // Increased from 0.95rem to 1.05rem
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-
-        &:hover {
-          background-color: #f0c850;
-          transform: translateY(-2px);
-        }
-      }
-    }
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .detail-container {
-    grid-template-columns: 1fr;
-    padding: 1rem;
-
-    .left-panel,
-    .right-panel {
-      height: auto;
-    }
-
-    .left-panel .artifact-image {
-      height: 300px;
-    }
-  }
-}
-</file>
-
-<file path="src/app/features/artifact-detail/artifact-detail.component.ts">
-import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import { ApiService } from '../../core/services/api.service';
-import { Artifact, ChatMessage } from '../../core/models/artifact.model';
-import { TranslateService } from '@ngx-translate/core';
-⋮----
-export class ArtifactDetailComponent implements OnInit {
-⋮----
-// Translation keys used via | translate in template
-⋮----
-ngOnInit(): void
-⋮----
-// Get artifact data from sessionStorage
-⋮----
-// Initialize with welcome message
-⋮----
-// No artifact data, redirect to upload
-⋮----
-sendMessage(): void
-⋮----
-// Add user message to chat
-⋮----
-// Clear input
-⋮----
-// Send to backend - backend handles landmark context
-⋮----
-sendSuggestedQuestion(questionKey: string): void
-</file>
-
-<file path="src/app/features/chat/chat.component.html">
-<div class="chat-page">
-  <div class="chat-container">
-    <div class="chat-header">
-      <h1>{{ 'chat.title' | translate }} <span class="highlight">{{ 'chat.highlight' | translate }}</span></h1>
-      <p class="subtitle">{{ 'chat.subtitle' | translate }}</p>
-    </div>
-
-    <div class="chat-messages">
-      @for (message of chatMessages(); track $index) {
-        <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
-          @if (message.role === 'assistant') {
-            <div class="avatar">
-              <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
-                <!-- Eye of Horus -->
-                <path d="M 15 40 Q 50 20, 85 40"
-                      stroke="#d4af37"
-                      stroke-width="4"
-                      fill="none"
-                      stroke-linecap="round"/>
-                <path d="M 15 40 Q 50 55, 85 40"
-                      stroke="#d4af37"
-                      stroke-width="4"
-                      fill="none"
-                      stroke-linecap="round"/>
-                <circle cx="50" cy="40" r="12" fill="#d4af37"/>
-                <circle cx="50" cy="40" r="6" fill="#000"/>
-                <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
-                      stroke="#d4af37"
-                      stroke-width="3.5"
-                      fill="none"
-                      stroke-linecap="round"/>
-              </svg>
-            </div>
-          }
-          <div class="message-content">
-            {{ message.content }}
-          </div>
-        </div>
-      }
-    </div>
-
-    <div class="suggested-questions">
-      @for (question of suggestedQuestions; track question) {
-        <button
-          class="suggestion-btn"
-          (click)="sendSuggestedQuestion(question)"
-        >
-          {{ question | translate }}
-        </button>
-      }
-    </div>
-
-    <div class="chat-input">
-      <input
-        type="text"
-        [placeholder]="'chat.placeholder' | translate"
-        [(ngModel)]="userMessage"
-        (keyup.enter)="sendMessage()"
-        [disabled]="isLoading()"
-      >
-      <button
-        class="send-btn"
-        (click)="sendMessage()"
-        [disabled]="isLoading()"
-      >
-        {{ (isLoading() ? 'chat.sending' : 'chat.send') | translate }}
-      </button>
-    </div>
-  </div>
-</div>
-</file>
-
 <file path="src/app/features/chat/chat.component.scss">
 .chat-page {
   min-height: calc(100vh - 80px);
@@ -2319,7 +1832,7 @@ sendSuggestedQuestion(questionKey: string): void
             background-color: rgba(212, 175, 55, 0.1);
             border-radius: 50%;
             border: 2px solid rgba(212, 175, 55, 0.3);
-            
+
             svg {
               filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
             }
@@ -2342,12 +1855,91 @@ sendSuggestedQuestion(questionKey: string): void
           }
         }
 
+        // ── Message wrapper (content + feedback row) ─────────────
+        .message-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+          max-width: 80%;
+        }
+
         .message-content {
           padding: 1rem 1.5rem;
           border-radius: 12px;
-          max-width: 80%;
           line-height: 1.6;
           font-size: 1.1rem;
+        }
+
+        // ── Feedback buttons ──────────────────────────────────────
+        .feedback-actions {
+          display: flex;
+          gap: 0.5rem;
+          padding-left: 0.25rem;
+
+          &.locked {
+            opacity: 0.6;
+          }
+
+          .feedback-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            background-color: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover:not(:disabled) {
+              border-color: rgba(212, 175, 55, 0.6);
+              color: rgba(212, 175, 55, 0.8);
+              background-color: rgba(212, 175, 55, 0.08);
+            }
+
+            &:disabled {
+              cursor: default;
+            }
+
+            &.active {
+              border-color: #d4af37;
+              color: #d4af37;
+              background-color: rgba(212, 175, 55, 0.15);
+            }
+          }
+        }
+
+        // ── Thinking bubble ───────────────────────────────────────
+        &.thinking-message {
+          .message-content.thinking-bubble {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.85rem 1.4rem;
+            background-color: rgba(212, 175, 55, 0.07);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+
+            .thinking-text {
+              color: rgba(212, 175, 55, 0.75);
+              font-size: 0.95rem;
+              font-style: italic;
+              margin-right: 4px;
+              letter-spacing: 0.02em;
+            }
+
+            .dot {
+              width: 7px;
+              height: 7px;
+              border-radius: 50%;
+              background-color: #d4af37;
+              animation: thinking-pulse 1.4s ease-in-out infinite;
+
+              &:nth-child(3) { animation-delay: 0.2s; }
+              &:nth-child(4) { animation-delay: 0.4s; }
+            }
+          }
         }
       }
     }
@@ -2420,7 +2012,19 @@ sendSuggestedQuestion(questionKey: string): void
   }
 }
 
-// Scrollbar styling
+// ── Thinking animation ─────────────────────────────────────────────────────
+@keyframes thinking-pulse {
+  0%, 80%, 100% {
+    transform: scale(0.55);
+    opacity: 0.35;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// ── Scrollbar styling ──────────────────────────────────────────────────────
 .chat-messages::-webkit-scrollbar {
   width: 8px;
 }
@@ -2439,7 +2043,7 @@ sendSuggestedQuestion(questionKey: string): void
   background: rgba(212, 175, 55, 0.5);
 }
 
-// Responsive
+// ── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .chat-page {
     padding: 1rem;
@@ -2475,30 +2079,51 @@ import { Component, ChangeDetectionStrategy, signal, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ApiService } from '../../core/services/api.service';
+import { ApiService, FeedbackRequest } from '../../core/services/api.service';
+import { HistoryService } from '../history/history.service';
 import { ChatMessage } from '../../core/models/artifact.model';
 ⋮----
 export class ChatComponent {
 ⋮----
-// Translation keys used via | translate in template
+// Tracks which message index has received feedback: 'up' | 'down' | null
 ⋮----
 sendMessage(): void
 ⋮----
-// Add user message
+// Start a general-chat session on the very first message of this visit
 ⋮----
-// Clear input
+// Append to the current session
 ⋮----
-// Send to LLM chat endpoint (general Egyptian history)
+sendFeedback(messageIndex: number, rating: 'up' | 'down'): void
+⋮----
+// Prevent sending feedback twice for the same message
+⋮----
+// Find the closest preceding user message as the question
+⋮----
+// Lock the button state so user can't change it after submission
 ⋮----
 sendSuggestedQuestion(questionKey: string): void
 </file>
 
 <file path="src/app/features/history/history.component.html">
 <div class="history-container">
-  <h1 class="page-title">{{ 'history.title' | translate }}</h1>
 
+  <!-- ── Page header ─────────────────────────────────────────── -->
+  <div class="page-header">
+    <h1 class="page-title">{{ 'history.title' | translate }}</h1>
+    @if (allSessions().length > 0) {
+      <button class="clear-all-btn" (click)="clearAll()">
+        {{ 'history.clearAll' | translate }}
+      </button>
+    }
+  </div>
+
+  <!-- ── Controls ────────────────────────────────────────────── -->
   <div class="controls">
     <div class="search-box">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="11" cy="11" r="7" stroke="rgba(212,175,55,0.6)" stroke-width="2"/>
+        <path d="M16.5 16.5L21 21" stroke="rgba(212,175,55,0.6)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
       <input
         type="text"
         [placeholder]="'history.searchPlaceholder' | translate"
@@ -2507,251 +2132,594 @@ sendSuggestedQuestion(questionKey: string): void
       >
     </div>
 
-    <div class="sort-box">
-      <select (change)="onSortChange($event)">
-        <option value="date">{{ 'history.sortByDate' | translate }}</option>
-        <option value="name">{{ 'history.sortByName' | translate }}</option>
-      </select>
+    <div class="filter-tabs">
+      <button class="tab" [class.active]="activeFilter() === 'all'"      (click)="setFilter('all')">
+        {{ 'history.filterAll' | translate }}
+      </button>
+      <button class="tab" [class.active]="activeFilter() === 'artifact'" (click)="setFilter('artifact')">
+        {{ 'history.filterArtifact' | translate }}
+      </button>
+      <button class="tab" [class.active]="activeFilter() === 'chat'"     (click)="setFilter('chat')">
+        {{ 'history.filterChat' | translate }}
+      </button>
     </div>
   </div>
 
-  @if (artifacts().length === 0) {
-    <div class="no-results">
-      <div class="no-results-icon">🔍</div>
-      <h3>{{ 'history.noResults' | translate }}</h3>
-      <p>{{ 'history.adjustSearch' | translate }}</p>
+  <!-- ── Empty state ─────────────────────────────────────────── -->
+  @if (filteredSessions().length === 0) {
+    <div class="empty-state">
+      <svg class="empty-icon-svg" width="72" height="72" viewBox="0 0 64 64" fill="none">
+        <circle cx="28" cy="28" r="18" stroke="rgba(212,175,55,0.4)" stroke-width="2.5"/>
+        <path d="M41 41L54 54" stroke="rgba(212,175,55,0.4)" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <h3>{{ (allSessions().length === 0 ? 'history.noHistory' : 'history.noResults') | translate }}</h3>
+      <p>{{ (allSessions().length === 0 ? 'history.startExploring' : 'history.adjustSearch') | translate }}</p>
     </div>
+
   } @else {
-    <div class="artifacts-grid">
-      @for (artifact of artifacts(); track artifact.id) {
-        <div class="artifact-card" (click)="onArtifactClick(artifact.id)">
-          <div class="artifact-image">
-            <img [src]="artifact.imageUrl" [alt]="artifact.landmark">
+
+    <!-- ── Sessions list ─────────────────────────────────────── -->
+    <div class="sessions-list">
+      @for (session of filteredSessions(); track session.id) {
+        <div class="session-card" [class.artifact]="session.source === 'artifact'" [class.chat]="session.source === 'chat'">
+
+          <!-- ── Session header (image + name + date) ── -->
+          <div class="session-header">
+
+            @if (session.source === 'artifact' && session.imageUrl) {
+              <img class="session-thumb" [src]="session.imageUrl" [alt]="session.artifactName">
+            } @else {
+              <!-- Placeholder for general chat -->
+              <div class="session-thumb-placeholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        stroke="rgba(212,175,55,0.6)" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            }
+
+            <div class="session-info">
+              <p class="session-name">
+                @if (session.source === 'artifact') {
+                  {{ session.artifactName || ('history.sourceArtifact' | translate) }}
+                } @else {
+                  {{ 'history.sourceChat' | translate }}
+                }
+              </p>
+              <p class="session-date">{{ session.startDate }}</p>
+              <p class="session-count">
+                {{ session.exchanges.length }}
+                {{ (session.exchanges.length === 1 ? 'history.exchange' : 'history.exchanges') | translate }}
+              </p>
+            </div>
+
+            <!-- source chip -->
+            <span class="source-chip" [class.artifact]="session.source === 'artifact'" [class.chat]="session.source === 'chat'">
+              {{ (session.source === 'artifact' ? 'history.sourceArtifact' : 'history.sourceChat') | translate }}
+            </span>
+
           </div>
-          <div class="artifact-info">
-            <h3>{{ artifact.landmark }}</h3>
-            <p class="date">{{ artifact.date }}</p>
+
+          <!-- ── Exchanges ───────────────────────────────────── -->
+          @if (session.exchanges.length > 0) {
+            <div class="exchanges-list">
+              @for (exchange of session.exchanges; track $index) {
+                <div class="exchange-item">
+
+                  <!-- Question -->
+                  <div class="qa-row">
+                    <span class="qa-label q-label">{{ 'history.question' | translate }}</span>
+                    <div class="qa-content">
+                      <p class="question-text">{{ exchange.question }}</p>
+                      <span class="exchange-time">{{ exchange.time }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Answer -->
+                  <div class="qa-row">
+                    <span class="qa-label a-label">{{ 'history.answer' | translate }}</span>
+                    <div class="qa-content">
+                      <p class="answer-text">
+                        {{ isExpanded(session.id, $index) ? exchange.answer : preview(exchange.answer) }}
+                      </p>
+                      @if (exchange.answer.length > PREVIEW_LEN) {
+                        <button class="toggle-btn" (click)="toggleExpand(session.id, $index)">
+                          {{ (isExpanded(session.id, $index) ? 'history.showLess' : 'history.showMore') | translate }}
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="no-exchanges">{{ 'history.noExchanges' | translate }}</p>
+          }
+
+          <!-- ── Session footer ──────────────────────────────── -->
+          <div class="session-footer">
+            <button class="delete-session-btn" (click)="deleteSession(session.id)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M19 6l-1 14H6L5 6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M9 6V4h6v2" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+              {{ 'history.delete' | translate }}
+            </button>
           </div>
+
         </div>
       }
     </div>
+
+    <p class="record-count">{{ filteredSessions().length }} / {{ allSessions().length }}</p>
   }
+
 </div>
 </file>
 
 <file path="src/app/features/history/history.component.scss">
+$gold:        #d4af37;
+$gold-faint:  rgba(212, 175, 55, 0.12);
+$gold-border: rgba(212, 175, 55, 0.25);
+$dark-card:   rgba(26, 26, 26, 0.75);
+$text-muted:  rgba(255, 255, 255, 0.5);
+$text-body:   rgba(255, 255, 255, 0.88);
+$grid-line:   rgba(212, 175, 55, 0.03);
+
 .history-container {
   min-height: calc(100vh - 80px);
   background-color: #0f0f0f;
+  background-image:
+    repeating-linear-gradient(90deg, $grid-line 0px, transparent 1px, transparent 40px, $grid-line 41px),
+    repeating-linear-gradient(0deg,  $grid-line 0px, transparent 1px, transparent 40px, $grid-line 41px);
   padding: 3rem;
-  background-image: 
-    repeating-linear-gradient(
-      90deg,
-      rgba(212, 175, 55, 0.03) 0px,
-      transparent 1px,
-      transparent 40px,
-      rgba(212, 175, 55, 0.03) 41px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      rgba(212, 175, 55, 0.03) 0px,
-      transparent 1px,
-      transparent 40px,
-      rgba(212, 175, 55, 0.03) 41px
-    );
+
+  // ── Page header ──────────────────────────────────────────────
+  .page-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 
   .page-title {
-    font-size: 3.5rem;
-    color: #d4af37;
-    margin-bottom: 2rem;
+    font-size: 3rem;
+    color: $gold;
     font-weight: 300;
   }
 
+  .clear-all-btn {
+    background: transparent;
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    color: rgba(255, 100, 100, 0.8);
+    padding: 0.5rem 1.4rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+
+    &:hover {
+      background: rgba(220, 53, 69, 0.15);
+      border-color: rgba(220, 53, 69, 0.7);
+      color: #ff6b6b;
+    }
+  }
+
+  // ── Controls ─────────────────────────────────────────────────
   .controls {
     display: flex;
-    gap: 2rem;
-    margin-bottom: 3rem;
-    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+  }
 
-    .search-box {
-      flex: 1;
-      max-width: 400px;
-      
-      input {
-        width: 100%;
-        background-color: rgba(26, 26, 26, 0.6);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        color: white;
-        padding: 0.9rem 1.3rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: all 0.3s;
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 440px;
 
-        &::placeholder {
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        &:focus {
-          outline: none;
-          border-color: #d4af37;
-          background-color: rgba(26, 26, 26, 0.8);
-          box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
-      }
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
     }
 
-    .sort-box {
-      select {
-        background-color: rgba(26, 26, 26, 0.6);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        color: white;
-        padding: 0.9rem 2.5rem 0.9rem 1.3rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23d4af37' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 1rem center;
+    input {
+      width: 100%;
+      background: $dark-card;
+      border: 1px solid $gold-border;
+      color: white;
+      padding: 0.85rem 1rem 0.85rem 2.8rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: all 0.25s;
 
-        &:focus {
-          outline: none;
-          border-color: #d4af37;
-          background-color: rgba(26, 26, 26, 0.8);
-          box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-        }
+      &::placeholder { color: $text-muted; }
 
-        &:hover {
-          border-color: rgba(212, 175, 55, 0.5);
-        }
-
-        option {
-          background-color: #1a1a1a;
-          color: white;
-        }
+      &:focus {
+        outline: none;
+        border-color: $gold;
+        box-shadow: 0 0 18px rgba(212, 175, 55, 0.15);
       }
     }
   }
 
-  .no-results {
-    text-align: center;
-    padding: 5rem 2rem;
-    color: rgba(255, 255, 255, 0.6);
+  .filter-tabs {
+    display: flex;
+    gap: 0.5rem;
 
-    .no-results-icon {
-      font-size: 4rem;
+    .tab {
+      background: transparent;
+      border: 1px solid $gold-border;
+      color: $text-muted;
+      padding: 0.6rem 1.2rem;
+      border-radius: 25px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+
+      &:hover { border-color: rgba(212, 175, 55, 0.5); color: rgba(255,255,255,0.8); }
+
+      &.active {
+        background: $gold-faint;
+        border-color: $gold;
+        color: $gold;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // ── Empty state ───────────────────────────────────────────────
+  .empty-state {
+    text-align: center;
+    padding: 6rem 2rem;
+
+    .empty-icon-svg {
       margin-bottom: 1.5rem;
-      opacity: 0.5;
+      opacity: 0.6;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     h3 {
       font-size: 1.8rem;
-      color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 0.5rem;
+      color: rgba(255,255,255,0.7);
       font-weight: 400;
+      margin-bottom: 0.75rem;
     }
 
-    p {
-      font-size: 1.1rem;
-      color: rgba(255, 255, 255, 0.5);
+    p { font-size: 1.1rem; color: $text-muted; }
+  }
+
+  // ── Sessions list ─────────────────────────────────────────────
+  .sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .session-card {
+    background: $dark-card;
+    border: 1px solid $gold-border;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    border-left: 4px solid transparent;
+
+    &.artifact { border-left-color: $gold; }
+    &.chat     { border-left-color: rgba(100, 180, 255, 0.65); }
+
+    &:hover {
+      border-color: rgba(212, 175, 55, 0.45);
+      box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
     }
   }
 
-  .artifacts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
+  // ── Session header ────────────────────────────────────────────
+  .session-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
 
-    .artifact-card {
-      background-color: rgba(26, 26, 26, 0.8);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.3s;
+  .session-thumb {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid $gold-border;
+  }
 
-      &:hover {
-        transform: translateY(-5px);
-        border-color: #d4af37;
-        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-      }
+  .session-thumb-placeholder {
+    width: 76px;
+    height: 76px;
+    border-radius: 10px;
+    background: rgba(212, 175, 55, 0.07);
+    border: 1px solid $gold-border;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 
-      .artifact-image {
-        width: 100%;
-        height: 250px;
-        background-color: #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
+  .session-info {
+    flex: 1;
 
-      .artifact-info {
-        padding: 1.5rem;
+    .session-name {
+      font-size: 1.25rem;
+      color: $gold;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
 
-        h3 {
-          color: #d4af37;
-          font-size: 1.5rem;
-          margin-bottom: 0.5rem;
-          font-weight: 400;
-        }
+    .session-date {
+      font-size: 1rem;       // bigger as requested
+      color: rgba(255,255,255,0.65);
+      margin-bottom: 0.2rem;
+    }
 
-        .date {
-          color: rgba(255, 255, 255, 0.6);
-          font-size: 0.95rem;
-        }
-      }
+    .session-count {
+      font-size: 0.83rem;
+      color: $text-muted;
     }
   }
 
-  // Responsive
+  .source-chip {
+    align-self: flex-start;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    flex-shrink: 0;
+
+    &.artifact {
+      background: $gold-faint;
+      color: $gold;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    &.chat {
+      background: rgba(100, 180, 255, 0.08);
+      color: rgba(140, 200, 255, 0.9);
+      border: 1px solid rgba(100, 180, 255, 0.25);
+    }
+  }
+
+  // ── Exchanges list ────────────────────────────────────────────
+  .exchanges-list {
+    padding: 1rem 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .exchange-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+  }
+
+  .qa-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .qa-label {
+    flex-shrink: 0;
+    width: 1.8rem;
+    height: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 0.85rem;
+
+    &.q-label {
+      background: rgba(212, 175, 55, 0.14);
+      color: $gold;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    &.a-label {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+  }
+
+  .qa-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .question-text {
+    color: $text-body;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .answer-text {
+    color: $text-muted;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .exchange-time {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.28);
+  }
+
+  .toggle-btn {
+    background: transparent;
+    border: none;
+    color: $gold;
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s;
+    text-align: start;
+
+    &:hover { opacity: 0.7; }
+  }
+
+  .no-exchanges {
+    padding: 1rem 1.5rem;
+    color: $text-muted;
+    font-size: 0.95rem;
+    font-style: italic;
+  }
+
+
+  // ── Session footer (delete) ───────────────────────────────────
+  .session-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.65rem 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .delete-session-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: rgba(255, 100, 100, 0.7);
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: rgba(220, 53, 69, 0.12);
+      border-color: rgba(220, 53, 69, 0.6);
+      color: #ff6b6b;
+    }
+  }
+
+  // ── Footer count ──────────────────────────────────────────────
+  .record-count {
+    text-align: center;
+    color: $text-muted;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+  }
+
+  // ── Responsive ────────────────────────────────────────────────
   @media (max-width: 768px) {
-    padding: 2rem 1.5rem;
+    padding: 2rem 1.25rem;
 
-    .page-title {
-      font-size: 2.5rem;
-    }
+    .page-title { font-size: 2.2rem; }
 
     .controls {
       flex-direction: column;
-      gap: 1rem;
+      align-items: stretch;
 
-      .search-box {
-        max-width: 100%;
-      }
+      .search-box { max-width: 100%; }
+      .filter-tabs { flex-wrap: wrap; }
     }
 
-    .artifacts-grid {
-      grid-template-columns: 1fr;
-    }
+    .session-thumb,
+    .session-thumb-placeholder { width: 56px; height: 56px; }
+
+    .session-header { gap: 1rem; padding: 1rem; }
+    .exchanges-list { padding: 0.75rem 1rem 1rem; }
   }
 }
 </file>
 
 <file path="src/app/features/history/history.component.ts">
-import { Component, ChangeDetectionStrategy, signal, inject, OnInit } from '@angular/core';
+import {
+  Component, ChangeDetectionStrategy, signal,
+  inject, OnInit, computed
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { Artifact } from '../../core/models/artifact.model';
+import { HistoryService } from './history.service';
+import { ChatSession } from '../../core/models/artifact.model';
 ⋮----
 export class HistoryComponent implements OnInit {
+⋮----
+/** Tracks which exchange answer is expanded: key = "sessionId-exchangeIndex" */
 ⋮----
 ngOnInit(): void
 ⋮----
 onSearch(event: Event): void
 ⋮----
-onSortChange(event: Event): void
+setFilter(f: 'all' | 'artifact' | 'chat'): void
 ⋮----
-applyFilter(): void
+/** Toggle expand/collapse for a single exchange answer */
+toggleExpand(sessionId: string, index: number): void
 ⋮----
-onArtifactClick(id: string): void
+isExpanded(sessionId: string, index: number): boolean
+⋮----
+preview(text: string): string
+⋮----
+deleteSession(id: string): void
+⋮----
+// Clean up expand keys for this session
+⋮----
+clearAll(): void
+</file>
+
+<file path="src/app/features/history/history.service.ts">
+import { Injectable } from '@angular/core';
+import { ChatSession, ChatExchange } from '../../core/models/artifact.model';
+⋮----
+export class HistoryService {
+⋮----
+/**
+   * Call once when a component starts (artifact upload or chat page first message).
+   * Creates a new session entry and stores it in localStorage.
+   */
+startSession(data: {
+    source: 'artifact' | 'chat';
+    artifactName?: string;
+    imageUrl?: string;
+}): void
+⋮----
+/**
+   * Append one Q&A pair to the active session.
+   * Safe to call even if no session was started (no-op).
+   */
+addExchange(exchange: Omit<ChatExchange, 'time'>): void
+⋮----
+getAll(): ChatSession[]
+⋮----
+deleteSession(id: string): void
+⋮----
+clearAll(): void
 </file>
 
 <file path="src/app/features/home/home.component.html">
@@ -3491,7 +3459,7 @@ capturePhoto(): void
     font-size: 2rem;
     font-weight: 300;
 
-    .logo-egy  { color: #fff; }
+    .logo-egy   { color: #fff; }
     .logo-guide { color: #d4af37; }
   }
 
@@ -3514,7 +3482,7 @@ capturePhoto(): void
   .lang-switcher {
     position: relative;
 
-    // Trigger: "Choose Language ▾"
+    // Trigger button
     .lang-selected {
       display: flex;
       align-items: center;
@@ -3537,11 +3505,8 @@ capturePhoto(): void
         border-color: #d4af37;
       }
 
-      .lang-label {
-        font-size: 0.95rem;
-      }
+      .lang-label { font-size: 0.95rem; }
 
-      // Rotating chevron
       .lang-arrow {
         color: rgba(212, 175, 55, 0.75);
         transition: transform 0.25s ease;
@@ -3551,12 +3516,15 @@ capturePhoto(): void
       }
     }
 
-    // Dropdown panel
+    // ── Dropdown panel ─────────────────────────────────────────
+    // inset-inline-end: 0  →  right:0 in LTR,  left:0 in RTL
+    // This single property replaces the old right:0 + :host-context RTL override,
+    // and works correctly in both directions with no extra blocks needed.
     .lang-dropdown {
       position: absolute;
       top: calc(100% + 0.5rem);
-      right: 0;
-      min-width: 170px;
+      inset-inline-end: 0;    // ← the only change needed for RTL support
+      min-width: 185px;
       background: #1c1c1c;
       border: 1px solid rgba(212, 175, 55, 0.3);
       border-radius: 10px;
@@ -3580,13 +3548,13 @@ capturePhoto(): void
         cursor: pointer;
         font-family: 'Cormorant Garamond', 'Georgia', 'Palatino', serif;
         font-size: 1.05rem;
-        text-align: left;
+        text-align: start;
         transition: background 0.2s, color 0.2s;
 
         &:last-child { border-bottom: none; }
 
         .option-flag {
-          font-size: 1.25rem;  // Larger flag emoji
+          font-size: 1.25rem;
           line-height: 1;
           flex-shrink: 0;
         }
@@ -3613,11 +3581,13 @@ capturePhoto(): void
   }
 }
 
+// ── Animations ─────────────────────────────────────────────────────────────
 @keyframes dropdownIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+// ── Responsive ─────────────────────────────────────────────────────────────
 @media (max-width: 768px) {
   .header {
     padding: 1rem 1.5rem;
@@ -3663,6 +3633,7 @@ onDocumentClick(event: MouseEvent): void
     "about": "عن المشروع"
   },
   "lang": {
+    "label": "اللغة",
     "en": "English",
     "ar": "العربية",
     "fr": "Français",
@@ -3677,10 +3648,12 @@ onDocumentClick(event: MouseEvent): void
   },
   "upload": {
     "dragDrop": "اسحب وأفلت صورة الأثر هنا",
-    "takePhoto" : "التقط صورة",
     "or": "أو",
     "browse": "تصفح الملفات",
     "fileInfo": "يدعم JPG وPNG. الحجم الأقصى 10MB.",
+    "takePhoto": "التقط صورة",
+    "capture": "التقاط",
+    "cancel": "إلغاء",
     "unknownTitle": "لم يتم التعرف على الأثر",
     "unknownText": "هذه الصورة ليست ضمن الآثار المصرية التي تم تدريب النظام عليها. حاول رفع صورة أخرى.",
     "tryAgain": "جرب صورة أخرى"
@@ -3699,7 +3672,8 @@ onDocumentClick(event: MouseEvent): void
     "sending": "جارٍ الإرسال...",
     "suggestedQ1": "أخبرني المزيد عن هذا الأثر",
     "suggestedQ2": "إلى أي عصر ينتمي هذا؟",
-    "suggestedQ3": "ما هي أهميته التاريخية؟"
+    "suggestedQ3": "ما هي أهميته التاريخية؟",
+    "welcome": "مرحباً! اسألني أي شيء عن {{name}}."
   },
   "chat": {
     "title": "تحدث مع",
@@ -3719,7 +3693,23 @@ onDocumentClick(event: MouseEvent): void
     "sortByDate": "ترتيب حسب: التاريخ",
     "sortByName": "ترتيب حسب: الاسم",
     "noResults": "لم يتم العثور على آثار",
-    "adjustSearch": "حاول تعديل معايير البحث"
+    "adjustSearch": "حاول تعديل معايير البحث",
+    "noHistory": "لا توجد محادثات بعد",
+    "startExploring": "ابدأ باستكشاف الآثار أو الدردشة وسيظهر سجل أسئلتك وأجوبتها هنا",
+    "filterAll": "الكل",
+    "filterArtifact": "جلسات الآثار",
+    "filterChat": "محادثة عامة",
+    "sourceArtifact": "أثر",
+    "sourceChat": "محادثة عامة",
+    "question": "س",
+    "answer": "ج",
+    "delete": "حذف",
+    "clearAll": "مسح الكل",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "exchange": "سؤال",
+    "exchanges": "أسئلة",
+    "noExchanges": "لا توجد أسئلة بعد"
   },
   "about": {
     "title": "عن",
@@ -3743,6 +3733,7 @@ onDocumentClick(event: MouseEvent): void
     "feature3Desc": "الوصول إلى السياق التاريخي التفصيلي والجداول الزمنية والأهمية الثقافية لكل أثر ومعلم في قاعدة بياناتنا.",
     "techTitle": "التقنيات المستخدمة",
     "techDesc": "مبني بأحدث تقنيات وأطر الذكاء الاصطناعي",
+    "footerTagline": "نجسر بين العصور القديمة والحديثة من خلال الذكاء الاصطناعي",
     "contactTitle": "تواصل معنا",
     "email": "البريد الإلكتروني",
     "universityName": "جامعة زويل للعلوم والتكنولوجيا",
@@ -3751,8 +3742,7 @@ onDocumentClick(event: MouseEvent): void
     "programClass": "دفعة 2026",
     "contactMessageTitle": "هل أنت مهتم بمشروعنا؟",
     "contactMessageText": "نرحب بالملاحظات وفرص التعاون والأسئلة حول EgyGuide. سواء كنت معلماً أو مؤرخاً أو مهتماً بالتكنولوجيا، يسعدنا التواصل معك.",
-    "contactClosing": "هذا المشروع جزء من التزامنا المستمر باستخدام الذكاء الاصطناعي للحفاظ على التراث الثقافي والتعليم.",
-    "footerTagline": "نجسر بين العصور القديمة والحديثة من خلال الذكاء الاصطناعي"
+    "contactClosing": "هذا المشروع جزء من التزامنا المستمر باستخدام الذكاء الاصطناعي للحفاظ على التراث الثقافي والتعليم."
   }
 }
 </file>
@@ -3804,8 +3794,8 @@ onDocumentClick(event: MouseEvent): void
     "send": "Senden",
     "sending": "Wird gesendet...",
     "suggestedQ1": "Erzähl mir mehr über dieses Artefakt",
-    "suggestedQ2": "Zu welcher Epoche gehört es?",
-    "suggestedQ3": "Was ist seine historische Bedeutung?"
+    "suggestedQ2": "Welcher Dynastie gehört es an?",
+    "suggestedQ3": "Wo befindet es sich?"
   },
   "chat": {
     "title": "Chatte mit",
@@ -3816,7 +3806,7 @@ onDocumentClick(event: MouseEvent): void
     "sending": "Wird gesendet...",
     "suggestedQ1": "Erzähl mir von den Pyramiden von Gizeh",
     "suggestedQ2": "Wer war Kleopatra?",
-    "suggestedQ3": "Was sind ägyptische Hieroglyphen?",
+    "suggestedQ3": "Wer ist Ramses II?",
     "suggestedQ4": "Erzähl mir vom Tal der Könige"
   },
   "history": {
@@ -3825,7 +3815,23 @@ onDocumentClick(event: MouseEvent): void
     "sortByDate": "Sortieren nach: Datum",
     "sortByName": "Sortieren nach: Name",
     "noResults": "Keine Artefakte gefunden",
-    "adjustSearch": "Versuche, deine Suchbegriffe anzupassen"
+    "adjustSearch": "Versuche, deine Suchbegriffe anzupassen",
+    "noHistory": "Noch keine Gespräche",
+    "startExploring": "Erkunde Artefakte oder chatte — dein F&A-Verlauf erscheint hier",
+    "filterAll": "Alle",
+    "filterArtifact": "Artefakt-Sitzungen",
+    "filterChat": "Allgemeiner Chat",
+    "sourceArtifact": "Artefakt",
+    "sourceChat": "Allgemeiner Chat",
+    "question": "F",
+    "answer": "A",
+    "delete": "Löschen",
+    "clearAll": "Alles löschen",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "exchange": "Austausch",
+    "exchanges": "Austausche",
+    "noExchanges": "Noch keine Fragen gestellt"
   },
   "about": {
     "title": "Über",
@@ -3849,7 +3855,16 @@ onDocumentClick(event: MouseEvent): void
     "feature3Desc": "Zugriff auf detaillierten historischen Kontext, Zeitlinien und kulturelle Bedeutung für jedes Artefakt und Monument in unserer Datenbank.",
     "techTitle": "Technologie-Stack",
     "techDesc": "Erstellt mit modernen KI-Technologien und Frameworks",
-    "footerTagline": "Das Alte und das Moderne durch KI verbinden"
+    "footerTagline": "Das Alte und das Moderne durch KI verbinden",
+    "contactTitle": "Kontakt aufnehmen",
+    "email": "E-Mail",
+    "universityName": "Zewail City Universität für Wissenschaft und Technologie",
+    "universityAddress": "Ahmed Zewail Straße, October Gardens, 6. Oktober Stadt, Gizeh, Ägypten",
+    "programName": "B.Sc. Datenwissenschaft & Künstliche Intelligenz",
+    "programClass": "Jahrgang 2026",
+    "contactMessageTitle": "Interesse an unserem Projekt?",
+    "contactMessageText": "Wir freuen uns über Feedback, Kooperationsmöglichkeiten und Fragen zu EgyGuide. Egal ob Pädagoge, Historiker oder Technikbegeisterter – wir freuen uns von Ihnen zu hören.",
+    "contactClosing": "Dieses Projekt ist Teil unseres anhaltenden Engagements, künstliche Intelligenz für den kulturellen Erhalt und die Bildung einzusetzen."
   }
 }
 </file>
@@ -3878,10 +3893,12 @@ onDocumentClick(event: MouseEvent): void
   },
   "upload": {
     "dragDrop": "Drag & Drop your artifact image here",
-    "takePhoto": "Take Photo",
     "or": "or",
     "browse": "Browse Files",
     "fileInfo": "Supports JPG, PNG. Max size 10MB.",
+    "capture": "Capture",
+    "cancel": "Cancel",
+    "takePhoto": "Take Photo",
     "unknownTitle": "Artifact Not Recognized",
     "unknownText": "This image is not part of our trained Egyptian artifacts. Please try another image.",
     "tryAgain": "Try Another Image"
@@ -3900,7 +3917,8 @@ onDocumentClick(event: MouseEvent): void
     "sending": "Sending...",
     "suggestedQ1": "Tell me more about this artifact",
     "suggestedQ2": "What is its dynasty?",
-    "suggestedQ3": "Where is it located?"
+    "suggestedQ3": "Where is it located?",
+    "welcome": "Welcome! Ask me anything about {{name}}."
   },
   "chat": {
     "title": "Chat with",
@@ -3911,7 +3929,8 @@ onDocumentClick(event: MouseEvent): void
     "sending": "Sending...",
     "suggestedQ1": "Tell me about the pyramids of Giza",
     "suggestedQ2": "Who was Cleopatra?",
-    "suggestedQ3": "Who is Ramessess II"
+    "suggestedQ3": "Who is Ramessess II",
+    "suggestedQ4": "Tell me about the Valley of the Kings"
   },
   "history": {
     "title": "My Exploration History",
@@ -3919,7 +3938,23 @@ onDocumentClick(event: MouseEvent): void
     "sortByDate": "Sort by: Date",
     "sortByName": "Sort by: Name",
     "noResults": "No artifacts found",
-    "adjustSearch": "Try adjusting your search terms"
+    "adjustSearch": "Try adjusting your search terms",
+    "noHistory": "No conversations yet",
+    "startExploring": "Start exploring artifacts or chatting — your Q&A history will appear here",
+    "filterAll": "All",
+    "filterArtifact": "Artifact Sessions",
+    "filterChat": "General Chat",
+    "sourceArtifact": "Artifact",
+    "sourceChat": "General Chat",
+    "question": "Q",
+    "answer": "A",
+    "delete": "Delete",
+    "clearAll": "Clear All",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "exchange": "exchange",
+    "exchanges": "exchanges",
+    "noExchanges": "No questions asked yet"
   },
   "about": {
     "title": "About",
@@ -3943,6 +3978,7 @@ onDocumentClick(event: MouseEvent): void
     "feature3Desc": "Access detailed historical context, timelines, and cultural significance for every artifact and monument in our database.",
     "techTitle": "Technology Stack",
     "techDesc": "Built with modern AI technologies and frameworks",
+    "footerTagline": "Bridging the ancient and the modern through AI",
     "contactTitle": "Get In Touch",
     "email": "Email",
     "universityName": "Zewail City of Science and Technology",
@@ -3951,8 +3987,7 @@ onDocumentClick(event: MouseEvent): void
     "programClass": "Class of 2026",
     "contactMessageTitle": "Interested in our project?",
     "contactMessageText": "We welcome feedback, collaboration opportunities, and questions about EgyGuide. Whether you're an educator, historian, or technology enthusiast, we'd love to hear from you.",
-    "contactClosing": "This project is part of our ongoing commitment to using artificial intelligence for cultural preservation and education.",
-    "footerTagline": "Bridging the ancient and the modern through AI"
+    "contactClosing": "This project is part of our ongoing commitment to using artificial intelligence for cultural preservation and education."
   }
 }
 </file>
@@ -4004,8 +4039,8 @@ onDocumentClick(event: MouseEvent): void
     "send": "Envoyer",
     "sending": "Envoi en cours...",
     "suggestedQ1": "Parlez-moi davantage de cet artefact",
-    "suggestedQ2": "À quelle époque appartient-il?",
-    "suggestedQ3": "Quelle est son importance historique?"
+    "suggestedQ2": "Quelle est sa dynastie?",
+    "suggestedQ3": "Où est-il situé?"
   },
   "chat": {
     "title": "Discutez avec",
@@ -4016,7 +4051,7 @@ onDocumentClick(event: MouseEvent): void
     "sending": "Envoi en cours...",
     "suggestedQ1": "Parlez-moi des pyramides de Gizeh",
     "suggestedQ2": "Qui était Cléopâtre?",
-    "suggestedQ3": "Que sont les hiéroglyphes égyptiens?",
+    "suggestedQ3": "Qui est Ramsès II?",
     "suggestedQ4": "Parlez-moi de la Vallée des Rois"
   },
   "history": {
@@ -4025,7 +4060,23 @@ onDocumentClick(event: MouseEvent): void
     "sortByDate": "Trier par: Date",
     "sortByName": "Trier par: Nom",
     "noResults": "Aucun artefact trouvé",
-    "adjustSearch": "Essayez de modifier vos termes de recherche"
+    "adjustSearch": "Essayez de modifier vos termes de recherche",
+    "noHistory": "Aucune conversation pour l'instant",
+    "startExploring": "Explorez des artefacts ou discutez — votre historique Q&R apparaîtra ici",
+    "filterAll": "Tout",
+    "filterArtifact": "Sessions Artefacts",
+    "filterChat": "Chat Général",
+    "sourceArtifact": "Artefact",
+    "sourceChat": "Chat Général",
+    "question": "Q",
+    "answer": "R",
+    "delete": "Supprimer",
+    "clearAll": "Tout effacer",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins",
+    "exchange": "échange",
+    "exchanges": "échanges",
+    "noExchanges": "Aucune question posée"
   },
   "about": {
     "title": "À Propos d'",
@@ -4049,7 +4100,16 @@ onDocumentClick(event: MouseEvent): void
     "feature3Desc": "Accédez au contexte historique détaillé, aux chronologies et à la signification culturelle de chaque artefact et monument dans notre base de données.",
     "techTitle": "Technologies Utilisées",
     "techDesc": "Construit avec des technologies et frameworks IA modernes",
-    "footerTagline": "Relier l'ancien et le moderne grâce à l'IA"
+    "footerTagline": "Relier l'ancien et le moderne grâce à l'IA",
+    "contactTitle": "Nous Contacter",
+    "email": "E-mail",
+    "universityName": "Université des Sciences et Technologies de Zewail",
+    "universityAddress": "Route Ahmed Zewail, Jardins d'Octobre, Ville du 6 Octobre, Gizeh, Égypte",
+    "programName": "Licence en Science des Données & Intelligence Artificielle",
+    "programClass": "Promotion 2026",
+    "contactMessageTitle": "Intéressé par notre projet?",
+    "contactMessageText": "Nous accueillons les retours, les opportunités de collaboration et les questions sur EgyGuide. Que vous soyez éducateur, historien ou passionné de technologie, nous serions ravis de vous entendre.",
+    "contactClosing": "Ce projet fait partie de notre engagement continu à utiliser l'intelligence artificielle pour la préservation culturelle et l'éducation."
   }
 }
 </file>
@@ -4101,8 +4161,8 @@ onDocumentClick(event: MouseEvent): void
     "send": "发送",
     "sending": "发送中...",
     "suggestedQ1": "告诉我更多关于这件文物的信息",
-    "suggestedQ2": "这件文物属于哪个时代？",
-    "suggestedQ3": "它有什么历史意义？"
+    "suggestedQ2": "它属于哪个王朝？",
+    "suggestedQ3": "它在哪里？"
   },
   "chat": {
     "title": "与以下对话",
@@ -4113,7 +4173,7 @@ onDocumentClick(event: MouseEvent): void
     "sending": "发送中...",
     "suggestedQ1": "告诉我吉萨金字塔的信息",
     "suggestedQ2": "克利奥帕特拉是谁？",
-    "suggestedQ3": "什么是埃及象形文字？",
+    "suggestedQ3": "拉美西斯二世是谁？",
     "suggestedQ4": "告诉我帝王谷的信息"
   },
   "history": {
@@ -4122,7 +4182,23 @@ onDocumentClick(event: MouseEvent): void
     "sortByDate": "排序方式：日期",
     "sortByName": "排序方式：名称",
     "noResults": "未找到文物",
-    "adjustSearch": "请尝试调整搜索条件"
+    "adjustSearch": "请尝试调整搜索条件",
+    "noHistory": "暂无对话记录",
+    "startExploring": "开始探索文物或聊天，您的问答历史记录将显示在此处",
+    "filterAll": "全部",
+    "filterArtifact": "文物对话",
+    "filterChat": "普通聊天",
+    "sourceArtifact": "文物",
+    "sourceChat": "普通聊天",
+    "question": "问",
+    "answer": "答",
+    "delete": "删除",
+    "clearAll": "清除全部",
+    "showMore": "展开",
+    "showLess": "收起",
+    "exchange": "问答",
+    "exchanges": "个问答",
+    "noExchanges": "暂无提问"
   },
   "about": {
     "title": "关于",
@@ -4146,13 +4222,18 @@ onDocumentClick(event: MouseEvent): void
     "feature3Desc": "访问我们数据库中每件文物和纪念碑的详细历史背景、时间线和文化意义。",
     "techTitle": "技术栈",
     "techDesc": "使用现代人工智能技术和框架构建",
-    "footerTagline": "通过人工智能连接古代与现代"
+    "footerTagline": "通过人工智能连接古代与现代",
+    "contactTitle": "联系我们",
+    "email": "电子邮件",
+    "universityName": "泽维尔科技大学",
+    "universityAddress": "艾哈迈德·泽维尔路，十月花园，六月城，吉萨，埃及",
+    "programName": "数据科学与人工智能理学学士",
+    "programClass": "2026届",
+    "contactMessageTitle": "对我们的项目感兴趣？",
+    "contactMessageText": "我们欢迎对EgyGuide的反馈、合作机会和问题。无论您是教育工作者、历史学家还是技术爱好者，我们都很乐意听取您的意见。",
+    "contactClosing": "该项目是我们持续致力于将人工智能用于文化遗产保护和教育事业的一部分。"
   }
 }
-</file>
-
-<file path="src/environments/environment.development.ts">
-
 </file>
 
 <file path="src/environments/environment.ts">
@@ -4301,6 +4382,742 @@ html {
     "src/**/*.d.ts"
   ]
 }
+</file>
+
+<file path="src/app/core/services/artifact-mock.service.ts">
+import { Injectable, signal } from '@angular/core';
+import { Artifact } from '../models/artifact.model';
+⋮----
+export class ArtifactMockService {
+⋮----
+getArtifacts()
+⋮----
+getArtifactById(id: string)
+⋮----
+addToHistory(artifact: Artifact)
+</file>
+
+<file path="src/app/features/artifact-detail/artifact-detail.component.html">
+<div class="detail-container">
+  @if (artifact(); as art) {
+    <div class="left-panel">
+      <div class="artifact-image">
+        @if (art.imageUrl) {
+          <img [src]="art.imageUrl" [alt]="art.landmark" class="uploaded-image">
+        } @else {
+          <div class="image-placeholder">
+            <svg width="200" height="200" viewBox="0 0 100 100" fill="none">
+              <path d="M 10 50 Q 50 20, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 10 50 Q 50 70, 90 50" stroke="#d4af37" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <circle cx="50" cy="50" r="15" fill="#d4af37"/>
+              <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+            </svg>
+          </div>
+        }
+      </div>
+
+      <h1 class="artifact-title">{{ art.landmark }}</h1>
+
+      <div class="quick-facts">
+        <h3>{{ 'detail.quickFacts' | translate }}</h3>
+        <ul>
+          @if (art.dynasty) {
+            <li><strong>{{ 'detail.dynasty' | translate }}:</strong> {{ art.dynasty }}</li>
+          }
+          @if (art.location) {
+            <li><strong>{{ 'detail.location' | translate }}:</strong> {{ art.location }}</li>
+          }
+          @if (art.description) {
+            <li><strong>{{ 'detail.description' | translate }}:</strong> {{ art.description }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="chat-header">
+        <h2>{{ 'detail.chatWith' | translate }} <span class="highlight">EgyGuide AI</span></h2>
+      </div>
+
+      <div class="chat-messages">
+        @for (message of chatMessages(); track $index) {
+          <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+            @if (message.role === 'assistant' && $index > 0) {
+              <div class="avatar">
+                <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+                  <path d="M 15 40 Q 50 20, 85 40"
+                        stroke="#d4af37"
+                        stroke-width="4"
+                        fill="none"
+                        stroke-linecap="round"/>
+                  <path d="M 15 40 Q 50 55, 85 40"
+                        stroke="#d4af37"
+                        stroke-width="4"
+                        fill="none"
+                        stroke-linecap="round"/>
+                  <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+                  <circle cx="50" cy="40" r="6" fill="#000"/>
+                  <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                        stroke="#d4af37"
+                        stroke-width="3.5"
+                        fill="none"
+                        stroke-linecap="round"/>
+                </svg>
+              </div>
+            }
+            <div class="message-wrapper">
+              <div class="message-content">
+                {{ message.content }}
+              </div>
+              @if (message.role === 'assistant' && $index > 0) {
+                <div class="feedback-actions" [class.locked]="feedbackState()[$index]">
+                  <button
+                    class="feedback-btn thumbs-up"
+                    [class.active]="feedbackState()[$index] === 'up'"
+                    [disabled]="!!feedbackState()[$index]"
+                    (click)="sendFeedback($index, 'up')"
+                    title="Helpful"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+                      <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                    </svg>
+                  </button>
+                  <button
+                    class="feedback-btn thumbs-down"
+                    [class.active]="feedbackState()[$index] === 'down'"
+                    [disabled]="!!feedbackState()[$index]"
+                    (click)="sendFeedback($index, 'down')"
+                    title="Not helpful"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+                      <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                    </svg>
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (isThinking()) {
+          <div class="message assistant thinking-message">
+            <div class="avatar">
+              <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+                <path d="M 15 40 Q 50 20, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <path d="M 15 40 Q 50 55, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+                <circle cx="50" cy="40" r="6" fill="#000"/>
+                <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                      stroke="#d4af37"
+                      stroke-width="3.5"
+                      fill="none"
+                      stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="message-content thinking-bubble">
+              <span class="thinking-text">Analyzing historical information...</span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="suggested-questions">
+        @for (question of suggestedQuestions; track question) {
+          <button
+            class="suggestion-btn"
+            (click)="sendSuggestedQuestion(question)"
+          >
+            {{ question | translate }}
+          </button>
+        }
+      </div>
+
+      <div class="chat-input">
+        <input
+          type="text"
+          [placeholder]="'detail.placeholder' | translate"
+          [(ngModel)]="userMessage"
+          (keyup.enter)="sendMessage()"
+          [disabled]="isLoading()"
+        >
+        <button class="send-btn" (click)="sendMessage()" [disabled]="isLoading()">
+          {{ (isLoading() ? 'detail.sending' : 'detail.send') | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</div>
+</file>
+
+<file path="src/app/features/artifact-detail/artifact-detail.component.scss">
+.detail-container {
+  min-height: calc(100vh - 80px);
+  background-color: #0f0f0f;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.5rem;
+  padding: 2rem;
+  align-items: start;
+
+  .left-panel {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+
+  .artifact-image {
+    width: 100%;
+    height: 450px;
+    background-color: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .uploaded-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      svg {
+        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+      }
+    }
+  }
+
+    .artifact-title {
+      font-size: 2.5rem;
+      color: #d4af37;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+  .quick-facts {
+    background-color: rgba(26, 26, 26, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    flex: 1;
+
+    h3 {
+      color: #d4af37;
+      font-size: 2.8rem;
+      margin-bottom: 1.5rem;
+      font-weight: 800;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.3rem;
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+        position: relative;
+
+        &:before {
+          content: '•';
+          color: #d4af37;
+          font-size: 1.3rem;
+          position: absolute;
+          left: 0;
+          top: -2px;
+        }
+
+        strong {
+          color: #d4af37;
+          font-weight: 550;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .artifact-image {
+    width: 100%;
+    height: 450px;
+    background-color: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .uploaded-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      svg {
+        filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5));
+      }
+    }
+  }
+  }
+
+  .right-panel {
+    background-color: rgba(26, 26, 26, 0.6);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    height: calc(100vh - 120px);
+
+    .chat-header {
+      margin-bottom: 1.5rem;
+
+      h2 {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.5rem;
+        font-weight: 400;
+
+        .highlight {
+          color: #d4af37;
+        }
+      }
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 1.5rem;
+      padding-right: 1rem;
+
+      .message {
+        margin-bottom: 1.2rem;
+        display: flex;
+        gap: 1rem;
+
+        &.assistant {
+          .avatar {
+            flex-shrink: 0;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+
+            svg {
+              filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+            }
+          }
+
+          .message-content {
+            background-color: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        &.user {
+          justify-content: flex-end;
+
+          .message-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        // ── Message wrapper (content + feedback row) ─────────────
+        .message-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+          max-width: 80%;
+        }
+
+        .message-content {
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          line-height: 1.6;
+          font-size: 1.1rem;
+        }
+
+        // ── Feedback buttons ──────────────────────────────────────
+        .feedback-actions {
+          display: flex;
+          gap: 0.5rem;
+          padding-left: 0.25rem;
+
+          &.locked {
+            opacity: 0.6;
+          }
+
+          .feedback-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            background-color: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover:not(:disabled) {
+              border-color: rgba(212, 175, 55, 0.6);
+              color: rgba(212, 175, 55, 0.8);
+              background-color: rgba(212, 175, 55, 0.08);
+            }
+
+            &:disabled {
+              cursor: default;
+            }
+
+            &.active {
+              border-color: #d4af37;
+              color: #d4af37;
+              background-color: rgba(212, 175, 55, 0.15);
+            }
+          }
+        }
+
+        // ── Thinking bubble ───────────────────────────────────────
+        &.thinking-message {
+          .message-content.thinking-bubble {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.85rem 1.4rem;
+            background-color: rgba(212, 175, 55, 0.07);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+
+            .thinking-text {
+              color: rgba(212, 175, 55, 0.75);
+              font-size: 0.95rem;
+              font-style: italic;
+              margin-right: 4px;
+              letter-spacing: 0.02em;
+            }
+
+            .dot {
+              width: 7px;
+              height: 7px;
+              border-radius: 50%;
+              background-color: #d4af37;
+              animation: thinking-pulse 1.4s ease-in-out infinite;
+
+              &:nth-child(3) { animation-delay: 0.2s; }
+              &:nth-child(4) { animation-delay: 0.4s; }
+            }
+          }
+        }
+      }
+    }
+
+    .suggested-questions {
+      display: flex;
+      gap: 0.8rem;
+      margin-bottom: 1.2rem;
+      flex-wrap: wrap;
+
+      .suggestion-btn {
+        background-color: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        padding: 0.7rem 1.5rem;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+
+        &:hover {
+          background-color: rgba(212, 175, 55, 0.1);
+          border-color: #d4af37;
+          color: #d4af37;
+        }
+      }
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+
+      input {
+        flex: 1;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 25px;
+        font-size: 1.05rem;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        &:focus {
+          outline: none;
+          border-color: #d4af37;
+        }
+      }
+
+      .send-btn {
+        background-color: #d4af37;
+        color: #1a1a1a;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 25px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background-color: #f0c850;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+// ── Thinking animation ─────────────────────────────────────────────────────
+@keyframes thinking-pulse {
+  0%, 80%, 100% {
+    transform: scale(0.55);
+    opacity: 0.35;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// ── Responsive ─────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+  .detail-container {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+
+    .left-panel,
+    .right-panel {
+      height: auto;
+    }
+
+    .left-panel .artifact-image {
+      height: 300px;
+    }
+  }
+}
+</file>
+
+<file path="src/app/features/artifact-detail/artifact-detail.component.ts">
+import { Component, ChangeDetectionStrategy, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ApiService, FeedbackRequest } from '../../core/services/api.service';
+import { HistoryService } from '../history/history.service';
+import { Artifact, ChatMessage } from '../../core/models/artifact.model';
+⋮----
+export class ArtifactDetailComponent implements OnInit {
+⋮----
+// Tracks which message index has received feedback: 'up' | 'down'
+⋮----
+ngOnInit(): void
+⋮----
+// Start a history session for this artifact visit
+⋮----
+sendMessage(): void
+⋮----
+sendFeedback(messageIndex: number, rating: 'up' | 'down'): void
+⋮----
+// Prevent sending feedback twice for the same message
+⋮----
+// Find the closest preceding user message as the question
+⋮----
+// Lock the button state so user can't change it after submission
+⋮----
+sendSuggestedQuestion(questionKey: string): void
+</file>
+
+<file path="src/app/features/chat/chat.component.html">
+<div class="chat-page">
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>{{ 'chat.title' | translate }} <span class="highlight">{{ 'chat.highlight' | translate }}</span></h1>
+      <p class="subtitle">{{ 'chat.subtitle' | translate }}</p>
+    </div>
+
+    <div class="chat-messages">
+      @for (message of chatMessages(); track $index) {
+        <div class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+          @if (message.role === 'assistant') {
+            <div class="avatar">
+              <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+                <!-- Eye of Horus -->
+                <path d="M 15 40 Q 50 20, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <path d="M 15 40 Q 50 55, 85 40"
+                      stroke="#d4af37"
+                      stroke-width="4"
+                      fill="none"
+                      stroke-linecap="round"/>
+                <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+                <circle cx="50" cy="40" r="6" fill="#000"/>
+                <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                      stroke="#d4af37"
+                      stroke-width="3.5"
+                      fill="none"
+                      stroke-linecap="round"/>
+              </svg>
+            </div>
+          }
+          <div class="message-wrapper">
+            <div class="message-content">
+              {{ message.content }}
+            </div>
+            @if (message.role === 'assistant') {
+              <div class="feedback-actions" [class.locked]="feedbackState()[$index]">
+                <button
+                  class="feedback-btn thumbs-up"
+                  [class.active]="feedbackState()[$index] === 'up'"
+                  [disabled]="!!feedbackState()[$index]"
+                  (click)="sendFeedback($index, 'up')"
+                  title="Helpful"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/>
+                    <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                  </svg>
+                </button>
+                <button
+                  class="feedback-btn thumbs-down"
+                  [class.active]="feedbackState()[$index] === 'down'"
+                  [disabled]="!!feedbackState()[$index]"
+                  (click)="sendFeedback($index, 'down')"
+                  title="Not helpful"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/>
+                    <path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (isThinking()) {
+        <div class="message assistant thinking-message">
+          <div class="avatar">
+            <svg width="50" height="50" viewBox="0 0 100 80" fill="none">
+              <!-- Eye of Horus -->
+              <path d="M 15 40 Q 50 20, 85 40"
+                    stroke="#d4af37"
+                    stroke-width="4"
+                    fill="none"
+                    stroke-linecap="round"/>
+              <path d="M 15 40 Q 50 55, 85 40"
+                    stroke="#d4af37"
+                    stroke-width="4"
+                    fill="none"
+                    stroke-linecap="round"/>
+              <circle cx="50" cy="40" r="12" fill="#d4af37"/>
+              <circle cx="50" cy="40" r="6" fill="#000"/>
+              <path d="M 85 40 Q 92 45, 90 52 Q 88 57, 83 55"
+                    stroke="#d4af37"
+                    stroke-width="3.5"
+                    fill="none"
+                    stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="message-content thinking-bubble">
+            <span class="thinking-text">Analyzing historical information...</span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="suggested-questions">
+      @for (question of suggestedQuestions; track question) {
+        <button
+          class="suggestion-btn"
+          (click)="sendSuggestedQuestion(question)"
+        >
+          {{ question | translate }}
+        </button>
+      }
+    </div>
+
+    <div class="chat-input">
+      <input
+        type="text"
+        [placeholder]="'chat.placeholder' | translate"
+        [(ngModel)]="userMessage"
+        (keyup.enter)="sendMessage()"
+        [disabled]="isLoading()"
+      >
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="isLoading()"
+      >
+        {{ (isLoading() ? 'chat.sending' : 'chat.send') | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+</file>
+
+<file path="src/environments/environment.development.ts">
+
 </file>
 
 </files>

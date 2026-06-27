@@ -131,22 +131,41 @@
       }
     }
   }
+
+  // ── Responsive ─────────────────────────────────────────────────
+  @media (max-width: 768px) {
+    padding: 1rem 1.2rem;
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+
+    .logo { font-size: 1.4rem; }
+
+    .nav {
+      gap: 1rem;
+      flex-wrap: wrap;
+      order: 3;
+      width: 100%;
+      justify-content: center;
+
+      a { font-size: 1rem; }
+    }
+
+    .lang-switcher .lang-selected {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .nav {
+      gap: 0.7rem;
+      a { font-size: 0.9rem; }
+    }
+  }
 }
 
 // ── Animations ─────────────────────────────────────────────────────────────
 @keyframes dropdownIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
-}
-
-// ── Responsive ─────────────────────────────────────────────────────────────
-@media (max-width: 768px) {
-  .header {
-    padding: 1rem 1.5rem;
-
-    .nav {
-      gap: 1.5rem;
-      a { font-size: 1.1rem; }
-    }
-  }
 }

@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  uploadApiUrl: 'https://contractedly-unblemishable-anitra.ngrok-free.dev',
+  uploadApiUrl: 'https://boxer-untidy-washbasin.ngrok-free.dev',
 
-  chatApiUrl: 'https://contractedly-unblemishable-anitra.ngrok-free.dev'
+  chatApiUrl: 'https://boxer-untidy-washbasin.ngrok-free.dev'
 };
